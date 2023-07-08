@@ -1,4 +1,11 @@
 # -*- coding: utf-8 -*-
+"""
+===========================
+Vimeo Tools Showcase Module
+===========================
+
+This module contains the class VimeoShowcase.
+"""
 from __future__ import annotations
 from typing import TYPE_CHECKING, Dict, Optional, List, Union, Any, Literal
 import vimeo

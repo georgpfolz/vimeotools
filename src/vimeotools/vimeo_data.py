@@ -1,4 +1,12 @@
 # -*- coding: utf-8 -*-
+"""
+=====================
+Vimeo Tools VimeoData
+=====================
+
+This module contains the class VimeoData, which is used to display
+information about a Vimeo account and its videos, folders and albums.
+"""
 from typing import TYPE_CHECKING, Dict, Optional, List, Union, Any, Literal
 import json
 from vimeo_constants import (
@@ -163,9 +171,10 @@ class VimeoData:
         Fetch videos from Vimeo.
         :param what: What to fetch. Either 'videos' or 'albums' (=='showcases').
         :param localpath: If it exists, fetches data from local file.
-        :param returning: - If 'dict', returns the video data as a dict, as provided by Vimeo.
-                          - If 'list', returns a list of dicts (one dict per video, as in the 'data' key of the Vimeo response)
-                          - If 'json', returns a json string.
+        :param returning:
+        - If 'dict', returns the video data as a dict, as provided by Vimeo.
+        - If 'list', returns a list of dicts (one dict per video, as in the 'data' key of the Vimeo response)
+        - If 'json', returns a json string.
         """
         # set returning to singular
         returning = self._transform_returning(returning=returning)  # type: ignore
@@ -778,10 +787,7 @@ class VimeoData:
         :return: list of dict
 
         Example:
-        >>> vimeo_client.get_videos_from_album(
-                album='123456',
-                returning='list'
-            )
+        vimeo_client.get_videos_from_album(album='123456', returning='list')
         """
         returning = self._transform_returning(returning) # type: ignore
 

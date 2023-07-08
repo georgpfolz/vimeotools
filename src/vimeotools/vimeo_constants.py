@@ -1,4 +1,11 @@
 # -*- coding: utf-8 -*-
+"""
+=====================
+Vimeo Tools Constants
+=====================
+
+This module contains constants used by the Vimeo Tools package.
+"""
 
 GETTER_STR ="""
 @property

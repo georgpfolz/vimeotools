@@ -1,8 +1,15 @@
 # -*- coding: utf-8 -*-
 """
-===========
-Vimeo Tools
-===========
+=============================
+Vimeo Tools Connection Module
+=============================
+
+This module contains the class VimeoConnection.
+
+All instances of the other classes must be initialized with a VimeoConnection object,
+which is used to connect to the Vimeo API. It contains the VimeoClient object
+from the vimeo package and the base URI, which is used to build the
+request URIs.
 """
 
 from typing import TYPE_CHECKING, Dict, Optional, List, Any, Union, Literal

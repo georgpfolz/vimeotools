@@ -1,4 +1,12 @@
 # -*- coding: utf-8 -*-
+"""
+=========================
+Vimeo Tools Folder Module
+=========================
+
+This module contains the class VimeoFolder, which represents a Vimeo folder
+(projects).
+"""
 from typing import List, Dict, Optional, Any, Union, Literal
 import vimeo
 import json

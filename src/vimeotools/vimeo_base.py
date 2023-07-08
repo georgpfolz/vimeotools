@@ -1,4 +1,13 @@
 # -*- coding: utf-8 -*-
+"""
+=============================
+Vimeo Tools Vimeo Base Module
+=============================
+
+This module contains the base classes VimeoChild and VimeoItem, as well as
+functions used by the other classes.
+"""
+
 from typing import TYPE_CHECKING, Dict, Optional, List, Union, Any, Literal
 import json
 from vimeo_constants import (

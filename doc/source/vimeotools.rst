@@ -7,8 +7,11 @@ Submodules
 .. toctree::
    :maxdepth: 4
 
-   vimeotools.test
-   vimeotools.vimeo_general
+   vimeotools.vimeo_base
+   vimeotools.vimeo_connection
+   vimeotools.vimeo_constants
+   vimeotools.vimeo_data
+   vimeotools.vimeo_folder
    vimeotools.vimeo_showcase
    vimeotools.vimeo_video
 
