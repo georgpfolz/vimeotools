@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vimeo Tools Folder Module &mdash; vimeotools  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> vimeotools
+          </a>
+              <div class="version">
+                0.0.1
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Vimeo Tools Folder Module</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">vimeotools</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Vimeo Tools Folder Module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/source/vimeotools.vimeo_folder.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <span class="target" id="module-vimeotools.vimeo_folder"></span><section id="vimeo-tools-folder-module">
+<h1>Vimeo Tools Folder Module<a class="headerlink" href="#vimeo-tools-folder-module" title="Permalink to this heading"></a></h1>
+<p>This module contains the class VimeoFolder, which represents a Vimeo folder
+(projects).</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="vimeotools.vimeo_folder.VimeoFolder">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">vimeotools.vimeo_folder.</span></span><span class="sig-name descname"><span class="pre">VimeoFolder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">connection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">code_or_uri</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">privacy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'nobody'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">users</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parent_folder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">password</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sort</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'date'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'grid'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theme</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'standard'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vimeotools.vimeo_folder.VimeoFolder" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">VimeoItem</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">VimeoChild</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>connection</strong> (<a class="reference internal" href="vimeotools.vimeo_connection.html#vimeotools.vimeo_connection.VimeoConnection" title="vimeotools.vimeo_connection.VimeoConnection"><em>VimeoConnection</em></a>) – </p></li>
+<li><p><strong>code_or_uri</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – </p></li>
+<li><p><strong>name</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – </p></li>
+<li><p><strong>description</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – </p></li>
+<li><p><strong>privacy</strong> (<em>Literal</em><em>[</em><em>'anybody'</em><em>, </em><em>'nobody'</em><em>, </em><em>'password'</em><em>, </em><em>'users'</em><em>]</em>) – </p></li>
+<li><p><strong>users</strong> (<em>List</em><em>[</em><em>str</em><em>]</em>) – </p></li>
+<li><p><strong>parent_folder</strong> (<em>Optional</em><em>[</em><em>Union</em><em>[</em><em>str</em><em>, </em><a class="reference internal" href="#vimeotools.vimeo_folder.VimeoFolder" title="vimeotools.vimeo_folder.VimeoFolder"><em>VimeoFolder</em></a><em>]</em><em>]</em>) – </p></li>
+<li><p><strong>password</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – </p></li>
+<li><p><strong>sort</strong> (<em>Literal</em><em>[</em><em>'arrange'</em><em>, </em><em>'date'</em><em>, </em><em>'manual'</em><em>, </em><em>'name'</em><em>, </em><em>'plays'</em><em>, </em><em>'likes'</em><em>, </em><em>'comments'</em><em>, </em><em>'duration'</em><em>]</em>) – </p></li>
+<li><p><strong>layout</strong> (<em>Literal</em><em>[</em><em>'grid'</em><em>, </em><em>'player'</em><em>]</em>) – </p></li>
+<li><p><strong>theme</strong> (<em>Literal</em><em>[</em><em>'dark'</em><em>, </em><em>'standard'</em><em>]</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vimeotools.vimeo_folder.VimeoFolder.BASE_URI">
+<span class="sig-name descname"><span class="pre">BASE_URI</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'/me/projects'</span></em><a class="headerlink" href="#vimeotools.vimeo_folder.VimeoFolder.BASE_URI" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vimeotools.vimeo_folder.VimeoFolder.add_video">
+<span class="sig-name descname"><span class="pre">add_video</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">video</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vimeotools.vimeo_folder.VimeoFolder.add_video" title="Permalink to this definition"></a></dt>
+<dd><p>Add a video to the folder.
+:type video: <code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">VimeoVideo</span></code>]
+:param video: Union[str, VimeoVideo]
+:return: None</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>video</strong> (<em>Union</em><em>[</em><em>str</em><em>, </em><a class="reference internal" href="vimeotools.vimeo_video.html#vimeotools.vimeo_video.VimeoVideo" title="vimeotools.vimeo_video.VimeoVideo"><em>VimeoVideo</em></a><em>]</em>) – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vimeotools.vimeo_folder.VimeoFolder.add_videos">
+<span class="sig-name descname"><span class="pre">add_videos</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">videos</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vimeotools.vimeo_folder.VimeoFolder.add_videos" title="Permalink to this definition"></a></dt>
+<dd><p>Add videos to the folder.
+:type videos: <code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">VimeoVideo</span></code>]]
+:param videos: List[Union[str, VimeoVideo]]
+:return: None</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>videos</strong> (<em>List</em><em>[</em><em>Union</em><em>[</em><em>str</em><em>, </em><a class="reference internal" href="vimeotools.vimeo_video.html#vimeotools.vimeo_video.VimeoVideo" title="vimeotools.vimeo_video.VimeoVideo"><em>VimeoVideo</em></a><em>]</em><em>]</em>) – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vimeotools.vimeo_folder.VimeoFolder.allowed_keys_to_set">
+<span class="sig-name descname"><span class="pre">allowed_keys_to_set</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['name']</span></em><a class="headerlink" href="#vimeotools.vimeo_folder.VimeoFolder.allowed_keys_to_set" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vimeotools.vimeo_folder.VimeoFolder.get_folders">
+<span class="sig-name descname"><span class="pre">get_folders</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">refresh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">returning</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'objects'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vimeotools.vimeo_folder.VimeoFolder.get_folders" title="Permalink to this definition"></a></dt>
+<dd><p>Get the folders in the folder.
+:rtype: <code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="#vimeotools.vimeo_folder.VimeoFolder" title="vimeotools.vimeo_folder.VimeoFolder"><code class="xref py py-class docutils literal notranslate"><span class="pre">VimeoFolder</span></code></a>], <code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]]]
+:return: List[VimeoFolder]</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>refresh</strong> (<em>bool</em>) – </p></li>
+<li><p><strong>returning</strong> (<em>Literal</em><em>[</em><em>'data'</em><em>, </em><em>'objects'</em><em>]</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><em>Union</em>[<em>List</em>[<a class="reference internal" href="#vimeotools.vimeo_folder.VimeoFolder" title="vimeotools.vimeo_folder.VimeoFolder"><em>VimeoFolder</em></a>], <em>List</em>[<em>Dict</em>[str, <em>Any</em>]]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vimeotools.vimeo_folder.VimeoFolder.get_items">
+<span class="sig-name descname"><span class="pre">get_items</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">refresh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">returning</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'objects'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vimeotools.vimeo_folder.VimeoFolder.get_items" title="Permalink to this definition"></a></dt>
+<dd><p>Get the items in the folder.
+:rtype: <code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">VimeoVideo</span></code>, <a class="reference internal" href="#vimeotools.vimeo_folder.VimeoFolder" title="vimeotools.vimeo_folder.VimeoFolder"><code class="xref py py-class docutils literal notranslate"><span class="pre">VimeoFolder</span></code></a>]], <code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]]]
+:return: List[Union[VimeoVideo, VimeoFolder]]</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>refresh</strong> (<em>bool</em>) – </p></li>
+<li><p><strong>returning</strong> (<em>Literal</em><em>[</em><em>'data'</em><em>, </em><em>'objects'</em><em>]</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><em>Union</em>[<em>List</em>[<em>Union</em>[<a class="reference internal" href="vimeotools.vimeo_video.html#vimeotools.vimeo_video.VimeoVideo" title="vimeotools.vimeo_video.VimeoVideo"><em>VimeoVideo</em></a>, <a class="reference internal" href="#vimeotools.vimeo_folder.VimeoFolder" title="vimeotools.vimeo_folder.VimeoFolder"><em>VimeoFolder</em></a>]], <em>List</em>[<em>Dict</em>[str, <em>Any</em>]]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vimeotools.vimeo_folder.VimeoFolder.get_name">
+<span class="sig-name descname"><span class="pre">get_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">refresh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vimeotools.vimeo_folder.VimeoFolder.get_name" title="Permalink to this definition"></a></dt>
+<dd><p>Get the folder name.
+:rtype: <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>
+:return: str</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>refresh</strong> (<em>bool</em>) – </p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vimeotools.vimeo_folder.VimeoFolder.get_videos">
+<span class="sig-name descname"><span class="pre">get_videos</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">refresh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">returning</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'objects'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vimeotools.vimeo_folder.VimeoFolder.get_videos" title="Permalink to this definition"></a></dt>
+<dd><p>Get the videos in the folder.
+:rtype: <code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">VimeoVideo</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]]]
+:return: List[VimeoVideo]</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>refresh</strong> (<em>bool</em>) – </p></li>
+<li><p><strong>returning</strong> (<em>Literal</em><em>[</em><em>'data'</em><em>, </em><em>'objects'</em><em>]</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><em>Union</em>[<em>List</em>[<a class="reference internal" href="vimeotools.vimeo_video.html#vimeotools.vimeo_video.VimeoVideo" title="vimeotools.vimeo_video.VimeoVideo"><em>VimeoVideo</em></a>], <em>List</em>[<em>Dict</em>[str, <em>Any</em>]]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vimeotools.vimeo_folder.VimeoFolder.remove_video">
+<span class="sig-name descname"><span class="pre">remove_video</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">video</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vimeotools.vimeo_folder.VimeoFolder.remove_video" title="Permalink to this definition"></a></dt>
+<dd><p>Remove a video from the folder.
+:type video: <code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">VimeoVideo</span></code>]
+:param video: Union[str, VimeoVideo]
+:return: None</p>
+<p>Note that this method does not delete the video from Vimeo.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>video</strong> (<em>Union</em><em>[</em><em>str</em><em>, </em><a class="reference internal" href="vimeotools.vimeo_video.html#vimeotools.vimeo_video.VimeoVideo" title="vimeotools.vimeo_video.VimeoVideo"><em>VimeoVideo</em></a><em>]</em>) – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vimeotools.vimeo_folder.VimeoFolder.remove_videos">
+<span class="sig-name descname"><span class="pre">remove_videos</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">videos</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vimeotools.vimeo_folder.VimeoFolder.remove_videos" title="Permalink to this definition"></a></dt>
+<dd><p>Remove videos from the folder.
+:type videos: <code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">VimeoVideo</span></code>]]
+:param videos: List[Union[str, VimeoVideo]]
+:return: None</p>
+<p>Note that this method does not delete the videos from Vimeo.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>videos</strong> (<em>List</em><em>[</em><em>Union</em><em>[</em><em>str</em><em>, </em><a class="reference internal" href="vimeotools.vimeo_video.html#vimeotools.vimeo_video.VimeoVideo" title="vimeotools.vimeo_video.VimeoVideo"><em>VimeoVideo</em></a><em>]</em><em>]</em>) – </p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Georg Pfolz.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
