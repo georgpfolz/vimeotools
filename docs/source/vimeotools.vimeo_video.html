@@ -29,7 +29,7 @@
             <a href="../index.html" class="icon icon-home"> vimeotools
           </a>
               <div class="version">
-                0.0.1
+                0.0.2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -75,7 +75,7 @@ as well as their bases classes VimeoChild and VimeoItem.</p>
 <p>All instances must be initialized with a VimeoConnection object</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="vimeotools.vimeo_video.VimeoVideo">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">VimeoVideo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">connection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">code_or_uri</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vimeotools.vimeo_video.VimeoVideo" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">VimeoVideo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">connection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">code_or_uri</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_object</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vimeotools.vimeo_video.VimeoVideo" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">VimeoItem</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">VimeoChild</span></code></p>
 <p>A class to represent a Vimeo video.</p>
 <dl class="field-list simple">
@@ -83,6 +83,8 @@ as well as their bases classes VimeoChild and VimeoItem.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>connection</strong> (<a class="reference internal" href="vimeotools.vimeo_connection.html#vimeotools.vimeo_connection.VimeoConnection" title="vimeotools.vimeo_connection.VimeoConnection"><em>VimeoConnection</em></a>) – </p></li>
 <li><p><strong>code_or_uri</strong> (<em>str</em>) – </p></li>
+<li><p><strong>data</strong> (<em>Optional</em><em>[</em><em>Dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em><em>]</em>) – </p></li>
+<li><p><strong>data_object</strong> (<em>Optional</em><em>[</em><a class="reference internal" href="vimeotools.vimeo_data.html#vimeotools.vimeo_data.VimeoData" title="vimeotools.vimeo_data.VimeoData"><em>VimeoData</em></a><em>]</em>) – </p></li>
 </ul>
 </dd>
 </dl>
@@ -101,6 +103,38 @@ as well as their bases classes VimeoChild and VimeoItem.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>domain</strong> (<em>str</em>) – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vimeotools.vimeo_video.VimeoVideo.add_tag">
+<span class="sig-name descname"><span class="pre">add_tag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">refresh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vimeotools.vimeo_video.VimeoVideo.add_tag" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tag</strong> (<em>str</em>) – </p></li>
+<li><p><strong>refresh</strong> (<em>bool</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vimeotools.vimeo_video.VimeoVideo.add_tags">
+<span class="sig-name descname"><span class="pre">add_tags</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tags</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">refresh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vimeotools.vimeo_video.VimeoVideo.add_tags" title="Permalink to this definition"></a></dt>
+<dd><p>Add tags to the video.
+:type tags: <code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]
+:param tags: str or list of str
+:type refresh: <code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>
+:param refresh: bool
+:return: None</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tags</strong> (<em>Union</em><em>[</em><em>str</em><em>, </em><em>List</em><em>[</em><em>str</em><em>]</em><em>]</em>) – </p></li>
+<li><p><strong>refresh</strong> (<em>bool</em>) – </p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -252,9 +286,9 @@ as well as their bases classes VimeoChild and VimeoItem.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="vimeotools.vimeo_video.VimeoVideo.get_showcases">
-<span class="sig-name descname"><span class="pre">get_showcases</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">returning</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'obj'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">refresh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vimeotools.vimeo_video.VimeoVideo.get_showcases" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_showcases</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">returning</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'object'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">refresh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vimeotools.vimeo_video.VimeoVideo.get_showcases" title="Permalink to this definition"></a></dt>
 <dd><p>Get the showcases the video is in.
-:type returning: <code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code>[‘obj’, ‘list’, ‘dict’, ‘names’, ‘codes’, ‘uris’]
+:type returning: <code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code>[‘object’, ‘objects’, ‘list’, ‘dict’, ‘name’, ‘names’, ‘code’, ‘codes’, ‘uri’, ‘uris’]
 :param returning: str
 :type refresh: <code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>
 :param refresh: bool
@@ -263,12 +297,28 @@ as well as their bases classes VimeoChild and VimeoItem.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>returning</strong> (<em>Literal</em><em>[</em><em>'obj'</em><em>, </em><em>'list'</em><em>, </em><em>'dict'</em><em>, </em><em>'names'</em><em>, </em><em>'codes'</em><em>, </em><em>'uris'</em><em>]</em>) – </p></li>
+<li><p><strong>returning</strong> (<em>Literal</em><em>[</em><em>'object'</em><em>, </em><em>'objects'</em><em>, </em><em>'list'</em><em>, </em><em>'dict'</em><em>, </em><em>'name'</em><em>, </em><em>'names'</em><em>, </em><em>'code'</em><em>, </em><em>'codes'</em><em>, </em><em>'uri'</em><em>, </em><em>'uris'</em><em>]</em>) – </p></li>
 <li><p><strong>refresh</strong> (<em>bool</em>) – </p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
 <dd class="field-even"><p><em>Union</em>[<em>List</em>[str], <em>Dict</em>[str, <em>Any</em>], <em>List</em>[<a class="reference internal" href="vimeotools.vimeo_showcase.html#vimeotools.vimeo_showcase.VimeoShowcase" title="vimeotools.vimeo_showcase.VimeoShowcase"><em>VimeoShowcase</em></a>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vimeotools.vimeo_video.VimeoVideo.get_tags">
+<span class="sig-name descname"><span class="pre">get_tags</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">returning</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'dict'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">refresh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vimeotools.vimeo_video.VimeoVideo.get_tags" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
+</dd>
+<dt class="field-even">Parameters</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>returning</strong> (<em>Literal</em><em>[</em><em>'dict'</em><em>, </em><em>'list'</em><em>, </em><em>'json'</em><em>, </em><em>'names'</em><em>, </em><em>'name'</em><em>, </em><em>'uris'</em><em>, </em><em>'uri'</em><em>, </em><em>'tags'</em><em>, </em><em>'tag'</em><em>, </em><em>'canonical'</em><em>]</em>) – </p></li>
+<li><p><strong>refresh</strong> (<em>bool</em>) – </p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -442,6 +492,41 @@ as well as their bases classes VimeoChild and VimeoItem.</p>
 </dl>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="vimeotools.vimeo_video.VimeoVideo.remove_tag">
+<span class="sig-name descname"><span class="pre">remove_tag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tag</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vimeotools.vimeo_video.VimeoVideo.remove_tag" title="Permalink to this definition"></a></dt>
+<dd><p>Remove a tag from the video.
+:type tag: <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>
+:param tag: str
+:return: None</p>
+<p>This method uses the delete method of the Vimeo API.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>tag</strong> (<em>str</em>) – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vimeotools.vimeo_video.VimeoVideo.remove_tags">
+<span class="sig-name descname"><span class="pre">remove_tags</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tags</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">refresh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vimeotools.vimeo_video.VimeoVideo.remove_tags" title="Permalink to this definition"></a></dt>
+<dd><p>Remove tags from the video.
+:type tags: <code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]
+:param tags: str or list of str
+:type refresh: <code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>
+:param refresh: bool
+:return: None</p>
+<p>This method uses the put method of the Vimeo API.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tags</strong> (<em>Union</em><em>[</em><em>str</em><em>, </em><em>List</em><em>[</em><em>str</em><em>]</em><em>]</em>) – </p></li>
+<li><p><strong>refresh</strong> (<em>bool</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py property">
 <dt class="sig sig-object py" id="vimeotools.vimeo_video.VimeoVideo.review_page">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">review_page</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#vimeotools.vimeo_video.VimeoVideo.review_page" title="Permalink to this definition"></a></dt>
@@ -451,6 +536,36 @@ as well as their bases classes VimeoChild and VimeoItem.</p>
 </dd>
 </dl>
 </dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vimeotools.vimeo_video.VimeoVideo.set_description">
+<span class="sig-name descname"><span class="pre">set_description</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vimeotools.vimeo_video.VimeoVideo.set_description" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>value</strong> (<em>str</em>) – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vimeotools.vimeo_video.VimeoVideo.set_key">
+<span class="sig-name descname"><span class="pre">set_key</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'locale'</span></em><a class="headerlink" href="#vimeotools.vimeo_video.VimeoVideo.set_key" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vimeotools.vimeo_video.VimeoVideo.set_tags">
+<span class="sig-name descname"><span class="pre">set_tags</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tags</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vimeotools.vimeo_video.VimeoVideo.set_tags" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>tags</strong> (<em>Union</em><em>[</em><em>str</em><em>, </em><em>List</em><em>[</em><em>str</em><em>]</em><em>, </em><em>List</em><em>[</em><em>Dict</em><em>[</em><em>str</em><em>, </em><em>str</em><em>]</em><em>]</em><em>]</em>) – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vimeotools.vimeo_video.VimeoVideo.setter_cmd">
+<span class="sig-name descname"><span class="pre">setter_cmd</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&quot;\n&#64;language.setter\ndef</span> <span class="pre">language(self,</span> <span class="pre">value:</span> <span class="pre">str):\n</span>&#160;&#160;&#160; <span class="pre">self._data['language']</span> <span class="pre">=</span> <span class="pre">value\n</span>&#160;&#160;&#160; <span class="pre">self.set_property('locale',</span> <span class="pre">value)\n&quot;</span></em><a class="headerlink" href="#vimeotools.vimeo_video.VimeoVideo.setter_cmd" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="vimeotools.vimeo_video.VimeoVideo.stats">
