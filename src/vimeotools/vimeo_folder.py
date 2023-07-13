@@ -249,6 +249,16 @@ class VimeoFolder(VimeoItem, VimeoChild):
         folders = self.get_folders(refresh=refresh)
         return videos + folders
     
+    @property
+    def nb_videos(
+        self
+    ) -> int:
+        """
+        Get the number of videos in the folder.
+        :return: int
+        """
+        return self._data['metadata']['connections']['videos']['total']  # type: ignore
+
     def remove_video(
         self,
         video: Union[str, 'VimeoVideo']

@@ -27,10 +27,7 @@ from vimeo_video import VimeoVideo as VimeoVideo_
 if TYPE_CHECKING:
     from vimeo_connection import VimeoConnection
     from vimeo_data import VimeoData
-"""
-if TYPE_CHECKING:
     from vimeo_video import VimeoVideo
-"""
 
 class VimeoShowcase(VimeoItem):
     """
@@ -57,7 +54,7 @@ class VimeoShowcase(VimeoItem):
         name: Optional[str] = None,
         data: Optional[Dict[str, Any]] = None,
         data_object: Optional[VimeoData] = None,
-        videos: List[VimeoVideo_] = [],
+        videos: List['VimeoVideo'] = [],
         creation_data: Optional[Dict[str, Any]] = {},  # for creation, must at least contain 'name'
     ):
         """
@@ -148,19 +145,11 @@ class VimeoShowcase(VimeoItem):
         Add a thumbnail to the showcase.
         """
         raise NotImplementedError
-    
-    @property
-    def videos(
-        self
-    ) -> List[VimeoVideo_]:
-        """
-        Get the videos of the showcase.
-        """
-        return self.get_videos()
+
 
     def add_video(
         self,
-        video: Union[str, VimeoVideo_]  # code or object
+        video: Union[str, 'VimeoVideo']  # code or object
     ):
         """
         Add a video to the showcase.
@@ -215,15 +204,6 @@ class VimeoShowcase(VimeoItem):
         """
         raise NotImplementedError
     
-    @property
-    def logos(
-        self
-    ):
-        """
-        Get the logos of the showcase.
-        """
-        raise NotImplementedError
-    
     def get_videos(
         self,
         refresh: bool = False,
@@ -243,7 +223,7 @@ class VimeoShowcase(VimeoItem):
     ) -> Union[
             Dict[str, Any],
             List[Dict[str, Any]],
-            List[VimeoVideo_],
+            List['VimeoVideo'],
             List[str],
             str
         ]:
@@ -324,6 +304,24 @@ class VimeoShowcase(VimeoItem):
         """
         raise NotImplementedError
 
+    @property
+    def logos(
+        self
+    ):
+        """
+        Get the logos of the showcase.
+        """
+        raise NotImplementedError
+    
+    @property
+    def nb_videos(
+        self
+    ) -> int:
+        """
+        Get the number of videos in the showcase.
+        """
+        return self._data['metadata']['connections']['videos']['total']  # type: ignore
+
     def remove_video(
         self,
         video: str
@@ -344,10 +342,10 @@ class VimeoShowcase(VimeoItem):
             raise PermissionError('You do not have permission to remove a video from this showcase.')
         elif response.status_code == 404:
             raise ValueError('The showcase or video does not exist.')
-    
+
     def replace_videos(
         self,
-        videos: List[Union[str, VimeoVideo_]]  # codes, uris or objects
+        videos: List[Union[str, 'VimeoVideo']]  # codes, uris or objects
     ):
         """
         Replace all the videos of the showcase.
@@ -395,3 +393,12 @@ class VimeoShowcase(VimeoItem):
         """
         raise NotImplementedError
 
+    @property
+    def videos(
+        self
+    ) -> List['VimeoVideo']:
+        """
+        Get the videos of the showcase.
+        """
+        return self.get_videos()  # no idea why this is should be an error
+    

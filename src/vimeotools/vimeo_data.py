@@ -57,49 +57,6 @@ class VimeoData:
         self._videos = None
         self._folders = None
         self._albums = None
-
-    def info(
-        self
-    ) -> str:
-        """
-        Return a string with information about the account and
-        informations about the videos, folders and albums.
-
-        Be warned that this method will make a lot of requests to the
-        Vimeo API, so it may take a while to complete.
-
-        :return: str
-        """
-        lines = [
-            f'Object: {VimeoConnection.__repr__(self)}',
-            f'  - Account:'
-        ]
-        lines += self.show_account(
-            mode='minimal',
-            indent=4,
-            returning='lines'
-        )
-        lines += self.show_videos(
-            mode='minimal',
-            indent=4,
-            returning='lines'
-        )
-        lines += self.show_folders(
-            mode='minimal',
-            indent=4,
-            returning='lines'
-        )
-        lines += self.show_showcases(
-            mode='minimal',
-            indent=4,
-            returning='lines'
-        )
-
-        lines.append(f'  - {self.get_count(what="videos")} Videos')
-        lines.append(f'  - {self.get_count(what="projects")} Folders')
-        lines.append(f'  - {self.get_count(what="albums")} Showcases')
-
-        return '\n'.join(lines)
     
     def _print(
             self,
@@ -138,7 +95,39 @@ class VimeoData:
             return self._albums_data
         elif what == 'projects' and self._folders_data:
             return self._folders_data
-    
+
+    def _get_account_data(
+        self,
+        returning: Literal['dict', 'json'] = 'dict',
+        keys: Optional[List[str]] = None,
+        refresh: bool = False
+    ) -> Union[dict, str]:
+        """
+        Get account infos.
+        :return: dict
+        """
+        if not refresh and self._account_data:
+            data = self._account_data
+        else:
+            uri = self.uri
+            response = self.client.get(uri)
+            assert response.status_code == 200, f'Error: {response.status_code}'
+            data = response.json()
+            data['code'] = data.get('uri').split('/')[-1]  # add vimeo code to data
+            self._account_data = data
+
+        if returning == 'json':
+            return json.dumps(data, indent=4)
+        else:  # returning == 'dict'
+            if keys:
+                return {
+                    key: data[key]
+                    for key
+                    in keys
+                }
+            else:
+                return data      
+
     def _items_stored(
         self,
         what: Literal['videos', 'albums', 'projects']
@@ -300,36 +289,74 @@ class VimeoData:
         else:
             # will never happen, we keep it for the return type check
             raise ValueError(f'Unknown returning value: {returning}')
-    
-    def get_count(
+
+    def _show_data(
         self,
-        what: Literal['videos', 'albums', 'projects'],
-        refresh: bool = False
-    ) -> int:
-        """
-        Get the number of items (videos or albums).
-        :param what: What to fetch. Either 'videos' or 'albums' (=='showcases').
-        """
-        if not refresh:
-            if what == 'videos' and self._videos_data:
-                return self._videos_data['total']
-            elif what == 'albums' and self._albums_data:
-                return self._albums_data['total']
-            elif what == 'projects' and self._folders_data:
-                return self._folders_data['total']
+        what: Literal[
+            'videos',
+            'video',
+            'album',
+            'albums',
+            'showcase',
+            'showcases',
+            'folder',
+            'folders',
+            'project',
+            'projects',
+            'account'
+        ],
+        mode: str = 'default',
+        ignore_keys: List[str] = [],
+        show_keys: List[str] = [],
+        indent: int = 0,
+        refresh: bool = False,
+        returning: Literal['str', 'lines'] = 'str'
+    ) -> Union[str, List[str]]:
+        what = transform_what(what) # type: ignore
 
-        response = self.client.get(
-            f'/me/{what}',
-            params={
-                'page': 1,
-                'per_page': 1
-            }
+        data = {}
+
+        if what == 'account':
+            data = self._get_account_data(
+                returning='dict',
+                refresh=refresh
+            )
+        elif what in ('videos', 'albums'):
+            data = self._get_items(
+                what=what,  # type: ignore (-> transform_what)
+                returning='dict',
+                refresh=refresh
+            )
+        elif what == 'projects':
+            data = self.get_folders(
+                returning='dict',
+                refresh=refresh
+            )
+        else:
+            raise ValueError(f'Unknown value for what: {what}')
+        
+        if show_keys:
+            ignore_keys = [
+                key
+                for key
+                in data.keys() # type: ignore (impossible that it's not a dict)
+                if key not in show_keys
+            ]
+        elif not ignore_keys:  # use mode only if no ignore_keys and no show_keys
+            if mode == 'default':
+                ignore_keys = ['pictures', 'metadata']
+            elif mode == 'minimal':
+                ignore_keys += MIN_KEYS[what]
+            elif mode == 'max':
+                ignore_keys = []
+        
+        return self._print(
+            data=data, # type: ignore (impossible that it's not a dict)
+            ignore_keys=ignore_keys,
+            indent=indent,
+            returning=returning
         )
-        if response.status_code != 200:
-            raise Exception(f'Error getting {what}: {response.text}')
-
-        return response.json()['total']
-
+    
     @property
     def account(
         self
@@ -364,48 +391,34 @@ class VimeoData:
             returning='json'
         ) # type: ignore
 
-    def _get_account_data(
+    def get_count(
         self,
-        returning: Literal['dict', 'json'] = 'dict',
-        keys: Optional[List[str]] = None,
+        what: Literal['videos', 'albums', 'projects'],
         refresh: bool = False
-    ) -> Union[dict, str]:
-        """
-        Get account infos.
-        :return: dict
-        """
-        if not refresh and self._account_data:
-            data = self._account_data
-        else:
-            uri = self.uri
-            response = self.client.get(uri)
-            assert response.status_code == 200, f'Error: {response.status_code}'
-            data = response.json()
-            data['code'] = data.get('uri').split('/')[-1]  # add vimeo code to data
-            self._account_data = data
-
-        if returning == 'json':
-            return json.dumps(data, indent=4)
-        else:  # returning == 'dict'
-            if keys:
-                return {
-                    key: data[key]
-                    for key
-                    in keys
-                }
-            else:
-                return data        
-    
-    @property
-    def folder_count(
-        self
     ) -> int:
         """
-        Get the number of folders.
+        Get the number of items (videos or albums).
+        :param what: What to fetch. Either 'videos' or 'albums' (=='showcases').
         """
-        return self.get_count(
-            what = 'projects'
-        ) # type: ignore
+        if not refresh:
+            if what == 'videos' and self._videos_data:
+                return self._videos_data['total']  # why is that an error? It should be a dict.
+            elif what == 'albums' and self._albums_data:
+                return self._albums_data['total']
+            elif what == 'projects' and self._folders_data:
+                return self._folders_data['total']
+
+        response = self.client.get(
+            f'/me/{what}',
+            params={
+                'page': 1,
+                'per_page': 1
+            }
+        )
+        if response.status_code != 200:
+            raise Exception(f'Error getting {what}: {response.text}')
+
+        return response.json()['total']
 
     def get_folders(
         self,
@@ -439,7 +452,262 @@ class VimeoData:
             returning=returning, # type: ignore
             refresh=refresh
         ) # type: ignore
+        
+    def get_showcases(
+        self,
+        returning: Literal[
+            'objects',
+            'object',
+            'showcase',  # alias for 'object'
+            'showcases',  # alias for 'objects'
+            'album',  # alias for 'object'
+            'albums',  # alias for 'objects'
+            'dict',
+            'list',
+            'code',
+            'codes',
+            'uri',
+            'uris',
+            'json'
+        ] = 'objects',
+        refresh: bool = False
+    ) -> Union[Dict[str, Any], List[Dict[str, Any]], List[VimeoShowcase], str]:
+        """
+        Fetch albums from Vimeo.
+        returns a list of VimeoShowcase objects by default
 
+        :param returning: str, default: 'item'
+                          - 'object', 'objects, 'album' or 'albums': returns a list of VimeoVideo objects
+                          - 'dict': returns a dict as provided by the Vimeo API
+                          - 'list': returns a list of dict as provided by the Vimeo API in the 'data' key
+                          - 'json': returns a json string
+        
+        Obviously, returning the list of VimeoShowcase objects takes more time than returning the list of dicts.
+        """
+        returning = transform_returning(returning) # type: ignore
+
+        return self._get_items(
+            what='albums',
+            returning=returning,  # type: ignore
+            refresh=refresh
+        ) # type: ignore
+
+    def get_videos(
+        self,
+        returning: Literal[
+            'object',
+            'objects',
+            'video',
+            'videos',
+            'code',
+            'codes',
+            'uri',
+            'uris',
+            'dict',
+            'list',
+            'json'
+        ] = 'objects',
+        refresh: bool = False
+    ) -> Union[Dict[str, Any], List[Dict[str, Any]], List[VimeoVideo], str]:
+        """
+        Fetch videos from Vimeo.
+        returns a list of VimeoVideo objects by default
+
+        :param returning: str, default: 'item'
+                          - 'item', 'items, 'video' or 'videos': returns a list of VimeoVideo objects
+                          - 'dict': returns a dict as provided by the Vimeo API
+                          - 'list': returns a list of dict as provided by the Vimeo API in the 'data' key
+                          - 'json': returns a json string
+        
+        Obviously, returning the list of VimeoVideo objects takes more time than returning the list of dicts.
+        """
+        returning = transform_returning(returning) # type: ignore
+
+        return self._get_items(
+            what='videos',
+            returning=returning,  # type: ignore
+            refresh=refresh
+        ) # type: ignore
+
+    def get_videos_from_showcase(
+        self,
+        showcase: Union[str, VimeoShowcase],
+        returning: Literal[
+            'object',
+            'objects',
+            'dict',
+            'list',
+            'json',
+            'code',
+            'codes',
+            'uri',
+            'uris'
+        ] = 'objects'
+    ) -> Union[List[Dict[str, Any]], List[str], List[VimeoVideo], str]:
+        """
+        Fetch the videos from an album.
+
+        This method should be obsolete,
+        as it is now possible to get the videos from an album directly from the VimeoShowcase object.
+
+        :param album_code: str
+        :param returning: str, default: 'dict'
+        :return: list of dict
+
+        Example:
+        vimeo_client.get_videos_from_album(album='123456', returning='list')
+        """
+        returning = transform_returning(returning) # type: ignore
+
+        try:
+            return showcase.get_videos(  # type: ignore
+                returning=returning
+            )
+        except AttributeError:
+            """
+            Maybe it would be better to get rid of this code altogether
+            and create a showcase object instead.
+            """
+            response = self.client.get(f'/albums/{showcase}/videos')
+            assert response.status_code == 200, f'Error: {response.status_code}'
+            album_data = response.json()
+
+            for video in album_data['data']:
+                video['code'] = video['uri'].split('/')[-1]
+
+            if returning == 'object':
+                return [
+                    VimeoVideo(
+                        code_or_uri=video['uri'],
+                        connection=self
+                    )
+                    for video
+                    in album_data['data']
+                ]
+            elif returning == 'dict':
+                return album_data
+            if 'code' in returning:
+                return [
+                    video['code']
+                    for video
+                    in album_data['data']
+                ]
+            elif returning == 'uri':
+                return [
+                    video['uri']
+                    for video
+                    in album_data['data']
+                ]
+            elif returning == 'list':
+                return album_data['data']
+            elif returning == 'json':
+                return json.dumps(album_data)
+            else:
+                raise ValueError(
+                    f'Invalid value for returning: {returning}'
+                )
+            
+    def get_videos_with_tag(
+        self,
+        tag: str,
+        returning: Literal[
+            'object',
+            'objects',
+            'dict',
+            'list',
+            'json',
+            'code',
+            'codes',
+            'uri',
+            'uris'
+        ] = 'objects',
+        refresh: bool = False
+    ) -> Union[VimeoVideo, List[Dict[str, Any]], List[str], str]:
+        returning = transform_returning(returning) # type: ignore
+        
+        if not refresh and self._videos_data is not None:
+            video = [
+                video
+                for video
+                in self._videos_data['data']
+                if tag in video['tags']['tag']
+            ][0]
+            video_uri = video['uri']
+        else:
+            response = self.client.get(f'/tags/{tag}/videos')
+            assert response.status_code == 200, f'Error: {response.status_code}'
+            video = response.json()
+            video_uri = video['data'][0]['uri']
+        
+        if returning =='object':
+            return VimeoVideo(
+                code_or_uri=video_uri,
+                client=self.client
+            )
+        elif returning == 'dict':
+            return video
+        elif returning == 'list':
+            return video['data']
+        elif returning == 'code':
+            return [
+                video['uri'].split('/')[-1]
+                for video
+                in video['data']
+            ]
+        elif returning =='uri':
+            return [
+                video['uri']
+                for video
+                in video['data']
+            ]
+        elif returning == 'json':
+            return json.dumps(video, indent=4)
+        else:
+            raise ValueError(f'Unknown returning value: {returning}')
+        
+    def info(
+        self
+    ) -> str:
+        """
+        Return a string with information about the account and
+        informations about the videos, folders and albums.
+
+        Be warned that this method will make a lot of requests to the
+        Vimeo API, so it may take a while to complete.
+
+        :return: str
+        """
+        lines = [
+            f'Object: {VimeoConnection.__repr__(self)}',
+            f'  - Account:'
+        ]
+        lines += self.show_account(
+            mode='minimal',
+            indent=4,
+            returning='lines'
+        )
+        lines += self.show_videos(
+            mode='minimal',
+            indent=4,
+            returning='lines'
+        )
+        lines += self.show_folders(
+            mode='minimal',
+            indent=4,
+            returning='lines'
+        )
+        lines += self.show_showcases(
+            mode='minimal',
+            indent=4,
+            returning='lines'
+        )
+
+        lines.append(f'  - {self.get_count(what="videos")} Videos')
+        lines.append(f'  - {self.get_count(what="projects")} Folders')
+        lines.append(f'  - {self.get_count(what="albums")} Showcases')
+
+        return '\n'.join(lines)  
+    
     def items_property(
         self,
         property: str,
@@ -513,58 +781,76 @@ class VimeoData:
                 ]
             return property_list
 
-    @property
-    def showcases(
-        self
-    ) -> List[VimeoShowcase]:
-        """
-        Get all showcases.
-        :return: list of VimeoShowcase objects
-
-        This property is always refreshed.
-        """
-        return self.get_showcases(
-            returning='objects'
-        ) # type: ignore
-    
-    def get_showcases(
+    def load(
         self,
-        returning: Literal[
-            'objects',
-            'object',
-            'showcase',  # alias for 'object'
-            'showcases',  # alias for 'objects'
-            'album',  # alias for 'object'
-            'albums',  # alias for 'objects'
-            'dict',
-            'list',
-            'code',
-            'codes',
-            'uri',
-            'uris',
-            'json'
-        ] = 'objects',
+        file: Union[Path, str] = Path('vimeo_data.json'),
+        format: Optional[Literal['json', 'pickle']] = None,
         refresh: bool = False
-    ) -> Union[Dict[str, Any], List[Dict[str, Any]], List[VimeoShowcase], str]:
-        """
-        Fetch albums from Vimeo.
-        returns a list of VimeoShowcase objects by default
+    ) -> None:
+        if isinstance(file, str):
+            file = Path(file)
 
-        :param returning: str, default: 'item'
-                          - 'object', 'objects, 'album' or 'albums': returns a list of VimeoVideo objects
-                          - 'dict': returns a dict as provided by the Vimeo API
-                          - 'list': returns a list of dict as provided by the Vimeo API in the 'data' key
-                          - 'json': returns a json string
+        if not file.exists():
+            raise FileNotFoundError(f'File not found: {file}')
         
-        Obviously, returning the list of VimeoShowcase objects takes more time than returning the list of dicts.
-        """
-        returning = transform_returning(returning) # type: ignore
+        if not format:
+            format = file.suffix[1:]  # type: ignore
 
-        return self._get_items(
-            what='albums',
-            returning=returning,  # type: ignore
-            refresh=refresh
+        if format == 'json':
+            with open(file, 'r') as f:
+                data = json.load(f)
+        elif format == 'pickle':
+            with open(file, 'rb') as f:
+                data = pickle.load(f)
+        else:
+            raise ValueError(f'Unknown format: {format}')
+        
+        if not data:
+            raise ValueError(f'No data in {file}')
+
+        self._data = data
+
+        # redundant!
+        self._account_data = data['account']
+        self._videos_data = data['videos']
+        self._folders_data = data['projects']
+        self._albums_data = data['albums']
+        
+    @property
+    def nb_folders(
+        self
+    ) -> int:
+        """
+        Get the number of folders.
+        """
+        return self.get_count(
+            what = 'projects'
         ) # type: ignore
+
+    @property
+    def nb_showcases(
+        self
+    ) -> int:
+        """
+        Get the number of showcases.
+        :return: int
+        """
+        return self.get_count(
+            what='albums'
+        )
+
+    @property
+    def nb_videos(
+        self
+    ) -> int:
+        """
+        Get the number of videos.
+        :param refresh: bool
+        :return: int
+        """
+        return self.get_count(
+            what='videos'
+        )
     
     def refresh(
         self,
@@ -597,6 +883,20 @@ class VimeoData:
             )
 
     @property
+    def showcases(
+        self
+    ) -> List[VimeoShowcase]:
+        """
+        Get all showcases.
+        :return: list of VimeoShowcase objects
+
+        This property is always refreshed.
+        """
+        return self.get_showcases(
+            returning='objects'
+        ) # type: ignore
+    
+    @property
     def showcase_codes(
         self,
         refresh: bool = False
@@ -624,18 +924,6 @@ class VimeoData:
                 for uri
                 in self.showcase_uris
             ]
-
-    @property
-    def showcase_count(
-        self
-    ) -> int:
-        """
-        Get the number of showcases.
-        :return: int
-        """
-        return self.get_count(
-            what='albums'
-        )
 
     @property
     def showcase_uris(
@@ -738,260 +1026,7 @@ class VimeoData:
             returning='objects'
         ) # type: ignore
 
-    def get_videos(
-        self,
-        returning: Literal[
-            'object',
-            'objects',
-            'video',
-            'videos',
-            'code',
-            'codes',
-            'uri',
-            'uris',
-            'dict',
-            'list',
-            'json'
-        ] = 'objects',
-        refresh: bool = False
-    ) -> Union[Dict[str, Any], List[Dict[str, Any]], List[VimeoVideo], str]:
-        """
-        Fetch videos from Vimeo.
-        returns a list of VimeoVideo objects by default
-
-        :param returning: str, default: 'item'
-                          - 'item', 'items, 'video' or 'videos': returns a list of VimeoVideo objects
-                          - 'dict': returns a dict as provided by the Vimeo API
-                          - 'list': returns a list of dict as provided by the Vimeo API in the 'data' key
-                          - 'json': returns a json string
-        
-        Obviously, returning the list of VimeoVideo objects takes more time than returning the list of dicts.
-        """
-        returning = transform_returning(returning) # type: ignore
-
-        return self._get_items(
-            what='videos',
-            returning=returning,  # type: ignore
-            refresh=refresh
-        ) # type: ignore
-
-    @property
-    def video_count(
-        self
-    ) -> int:
-        """
-        Get the number of videos.
-        :param refresh: bool
-        :return: int
-        """
-        return self.get_count(
-            what='videos'
-        )
-
-    def get_videos_from_showcase(
-        self,
-        showcase: Union[str, VimeoShowcase],
-        returning: Literal[
-            'object',
-            'objects',
-            'dict',
-            'list',
-            'json',
-            'code',
-            'codes',
-            'uri',
-            'uris'
-        ] = 'objects'
-    ) -> Union[List[Dict[str, Any]], List[str], List[VimeoVideo], str]:
-        """
-        Fetch the videos from an album.
-
-        This method should be obsolete,
-        as it is now possible to get the videos from an album directly from the VimeoShowcase object.
-
-        :param album_code: str
-        :param returning: str, default: 'dict'
-        :return: list of dict
-
-        Example:
-        vimeo_client.get_videos_from_album(album='123456', returning='list')
-        """
-        returning = transform_returning(returning) # type: ignore
-
-        try:
-            return showcase.get_videos(  # type: ignore
-                returning=returning
-            )
-        except AttributeError:
-            """
-            Maybe it would be better to get rid of this code altogether
-            and create a showcase object instead.
-            """
-            response = self.client.get(f'/albums/{showcase}/videos')
-            assert response.status_code == 200, f'Error: {response.status_code}'
-            album_data = response.json()
-
-            for video in album_data['data']:
-                video['code'] = video['uri'].split('/')[-1]
-
-            if returning == 'object':
-                return [
-                    VimeoVideo(
-                        code_or_uri=video['uri'],
-                        connection=self
-                    )
-                    for video
-                    in album_data['data']
-                ]
-            elif returning == 'dict':
-                return album_data
-            if 'code' in returning:
-                return [
-                    video['code']
-                    for video
-                    in album_data['data']
-                ]
-            elif returning == 'uri':
-                return [
-                    video['uri']
-                    for video
-                    in album_data['data']
-                ]
-            elif returning == 'list':
-                return album_data['data']
-            elif returning == 'json':
-                return json.dumps(album_data)
-            else:
-                raise ValueError(
-                    f'Invalid value for returning: {returning}'
-                )
-        
-    def get_videos_with_tag(
-        self,
-        tag: str,
-        returning: Literal[
-            'object',
-            'objects',
-            'dict',
-            'list',
-            'json',
-            'code',
-            'codes',
-            'uri',
-            'uris'
-        ] = 'objects',
-        refresh: bool = False
-    ) -> Union[VimeoVideo, List[Dict[str, Any]], List[str], str]:
-        returning = transform_returning(returning) # type: ignore
-        
-        if not refresh and self._videos_data is not None:
-            video = [
-                video
-                for video
-                in self._videos_data['data']
-                if tag in video['tags']['tag']
-            ][0]
-            video_uri = video['uri']
-        else:
-            response = self.client.get(f'/tags/{tag}/videos')
-            assert response.status_code == 200, f'Error: {response.status_code}'
-            video = response.json()
-            video_uri = video['data'][0]['uri']
-        
-        if returning =='object':
-            return VimeoVideo(
-                code_or_uri=video_uri,
-                client=self.client
-            )
-        elif returning == 'dict':
-            return video
-        elif returning == 'list':
-            return video['data']
-        elif returning == 'code':
-            return [
-                video['uri'].split('/')[-1]
-                for video
-                in video['data']
-            ]
-        elif returning =='uri':
-            return [
-                video['uri']
-                for video
-                in video['data']
-            ]
-        elif returning == 'json':
-            return json.dumps(video, indent=4)
-        else:
-            raise ValueError(f'Unknown returning value: {returning}')
-
-    def _show_data(
-        self,
-        what: Literal[
-            'videos',
-            'video',
-            'album',
-            'albums',
-            'showcase',
-            'showcases',
-            'folder',
-            'folders',
-            'project',
-            'projects',
-            'account'
-        ],
-        mode: str = 'default',
-        ignore_keys: List[str] = [],
-        show_keys: List[str] = [],
-        indent: int = 0,
-        refresh: bool = False,
-        returning: Literal['str', 'lines'] = 'str'
-    ) -> Union[str, List[str]]:
-        what = transform_what(what) # type: ignore
-
-        data = {}
-
-        if what == 'account':
-            data = self._get_account_data(
-                returning='dict',
-                refresh=refresh
-            )
-        elif what in ('videos', 'albums'):
-            data = self._get_items(
-                what=what,
-                returning='dict',
-                refresh=refresh
-            )
-        elif what == 'projects':
-            data = self.get_folders(
-                returning='dict',
-                refresh=refresh
-            )
-        else:
-            raise ValueError(f'Unknown value for what: {what}')
-        
-        if show_keys:
-            ignore_keys = [
-                key
-                for key
-                in data.keys() # type: ignore (impossible that it's not a dict)
-                if key not in show_keys
-            ]
-        elif not ignore_keys:  # use mode only if no ignore_keys and no show_keys
-            if mode == 'default':
-                ignore_keys = ['pictures', 'metadata']
-            elif mode == 'minimal':
-                ignore_keys += MIN_KEYS[what]
-            elif mode == 'max':
-                ignore_keys = []
-        
-        return self._print(
-            data=data, # type: ignore (impossible that it's not a dict)
-            ignore_keys=ignore_keys,
-            indent=indent,
-            returning=returning
-        )
-    
-    def load(
+    def save(
         self,
         file: Union[Path, str] = Path('vimeo_data.json'),
         format: Optional[Literal['json', 'pickle']] = None,
@@ -999,44 +1034,9 @@ class VimeoData:
     ) -> None:
         if isinstance(file, str):
             file = Path(file)
-
-        if not file.exists():
-            raise FileNotFoundError(f'File not found: {file}')
         
         if not format:
-            format = file.suffix[1:]  # type: ignore
-
-        if format == 'json':
-            with open(file, 'r') as f:
-                data = json.load(f)
-        elif format == 'pickle':
-            with open(file, 'rb') as f:
-                data = pickle.load(f)
-        else:
-            raise ValueError(f'Unknown format: {format}')
-        
-        if not data:
-            raise ValueError(f'No data in {file}')
-
-        self._data = data
-
-        # redundant!
-        self._account_data = data['account']
-        self._videos_data = data['videos']
-        self._folders_data = data['projects']
-        self._albums_data = data['albums']
-    
-    def save(
-        self,
-        file: Optional[Union[Path, str]] = Path('vimeo_data.json'),
-        format: Optional[Literal['json', 'pickle']] = None,
-        refresh: bool = False
-    ) -> None:
-        if isinstance(file, str):
-            file = Path(file)
-        
-        if not format:
-            format = file.suffix[1:]  # type: ignore
+            format = file.suffix[1:]  # type: ignore (impossible that it's not a Path)
 
         data_to_save = {
             'account': self._get_account_data(
