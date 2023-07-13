@@ -10,7 +10,11 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Dict, Optional, List, Union, Any, Literal
 import vimeo
 import json
-from vimeo_base import VimeoItem, get_lines
+from vimeo_base import (
+    VimeoItem,
+    get_lines,
+    transform_returning
+)
 from vimeo_constants import (
     GETTER_STR,
     SETTER_STR,
@@ -22,6 +26,7 @@ from vimeo_video import VimeoVideo as VimeoVideo_
 
 if TYPE_CHECKING:
     from vimeo_connection import VimeoConnection
+    from vimeo_data import VimeoData
 """
 if TYPE_CHECKING:
     from vimeo_video import VimeoVideo
@@ -33,6 +38,7 @@ class VimeoShowcase(VimeoItem):
     """
     BASE_URI = '/albums'
     API_URI = '/me/albums'
+    USER_URI = '/users/{user_id}/albums'
     allowed_keys_to_set = SHOWCASE_ALLOWED_KEYS_TO_SET
 
     for key, val in PROPERTIES_SHOWCASE.items():
@@ -49,6 +55,9 @@ class VimeoShowcase(VimeoItem):
         connection: VimeoConnection,
         code_or_uri: Optional[str] = None,
         name: Optional[str] = None,
+        data: Optional[Dict[str, Any]] = None,
+        data_object: Optional[VimeoData] = None,
+        videos: List[VimeoVideo_] = [],
         creation_data: Optional[Dict[str, Any]] = {},  # for creation, must at least contain 'name'
     ):
         """
@@ -61,9 +70,15 @@ class VimeoShowcase(VimeoItem):
         # init the parent class
         super().__init__(
             code_or_uri=code_or_uri,
-            connection=connection
+            connection=connection,
+            data=data,
+            data_object=data_object
         )
-        self._videos = None
+        self._videos = videos
+
+        if data:  # data provided, no request needed
+            self._data = data
+            return
 
         if name:
             creation_data['name'] = name  # type: ignore
@@ -77,12 +92,17 @@ class VimeoShowcase(VimeoItem):
             response = self.client.post(self.API_URI, data=creation_data)
             if response.status_code == 201:  # success in creating a new showcase
                 self._data = response.json()
+                self._uri = self._data['uri']
+                self._code = self._data['uri'].split('/')[-1]
             elif response.status_code == 400:
                 raise ValueError('Invalid data.')
             elif response.status_code == 403:
                 raise PermissionError('You do not have permission to create a showcase.')
             else:
                 raise ValueError(f'Status code {response.status_code}. Unknown error.')
+        
+        for video in videos:
+            self.add_video(video)
     
     def __str__(self) -> str:
         ignore_keys = ['user', 'metadata', 'pictures']
@@ -102,9 +122,7 @@ class VimeoShowcase(VimeoItem):
                 indent=2
             )
         
-        
-
-        videos = self.videos
+        videos = self.videos or []
         lines.append(f'  - {len(videos)} Videos')
         if videos:
             for video in videos:
@@ -131,6 +149,15 @@ class VimeoShowcase(VimeoItem):
         """
         raise NotImplementedError
     
+    @property
+    def videos(
+        self
+    ) -> List[VimeoVideo_]:
+        """
+        Get the videos of the showcase.
+        """
+        return self.get_videos()
+
     def add_video(
         self,
         video: Union[str, VimeoVideo_]  # code or object
@@ -138,12 +165,12 @@ class VimeoShowcase(VimeoItem):
         """
         Add a video to the showcase.
         """
-        try:
-            video = video.get_code() # type: ignore
-        except AttributeError:
-            pass
-            
-        uri = f'{self.API_URI}/{self.code}/videos/{video}'
+        if isinstance(video, VimeoVideo_):
+            video = video.code # type: ignore
+
+        # uri_base = self.USER_URI.format(user_id=self.user_id) 
+        uri = f'{self.BASE_URI}/{self.code}/videos/{video}'
+        print('uri', uri)
         
         response = self.client.put(uri)
         if response.status_code == 204:
@@ -201,14 +228,18 @@ class VimeoShowcase(VimeoItem):
         self,
         refresh: bool = False,
         returning: Literal[
+            'code',
             'codes',
+            'uri',
             'uris',
+            'name',
             'names',
             'dict',
             'list',
+            'object',
             'objects',
             'json'
-        ] = 'objects'
+        ] = 'object'
     ) -> Union[
             Dict[str, Any],
             List[Dict[str, Any]],
@@ -219,7 +250,7 @@ class VimeoShowcase(VimeoItem):
         """
         Get the videos of the showcase.
         """
-        print('get_videos')
+        returning = transform_returning(returning)
         
         if not refresh and self._videos:
             return self._videos
@@ -246,7 +277,7 @@ class VimeoShowcase(VimeoItem):
                 return videos
             elif returning == 'list':
                 return videos['data'] # type: ignore
-            elif returning == 'objects':
+            elif returning == 'object':
                 return [
                     VimeoVideo_(
                         connection=self.connection,
@@ -255,9 +286,9 @@ class VimeoShowcase(VimeoItem):
                 ]
             elif returning == 'json':
                 return json.dumps(videos)
-            elif returning == 'codes':
+            elif returning == 'code':
                 return [video['uri'].split('/')[-1] for video in videos]
-            elif returning in ('uris', 'names'):
+            elif returning in ('uri', 'name'):
                 return [video[returning[:-1]] for video in videos]
             else:
                 raise ValueError(f'Invalid value {returning} for returning.')

@@ -15,13 +15,14 @@ request URIs.
 from typing import TYPE_CHECKING, Dict, Optional, List, Any, Union, Literal
 import vimeo
 import json
+from pathlib import Path
     
 
 class VimeoConnection:
 
     def __init__(
         self,
-        config_file: Optional[str] = 'vimeo_config.json',
+        config_file: Optional[Union[str, Path]] = Path('vimeo_config.json'),
         token: Optional[str] = None,
         key: Optional[str] = None,
         secret: Optional[str] = None

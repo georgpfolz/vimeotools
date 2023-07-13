@@ -7,17 +7,17 @@ Vimeo Tools Folder Module
 This module contains the class VimeoFolder, which represents a Vimeo folder
 (projects).
 """
-from typing import List, Dict, Optional, Any, Union, Literal
-import vimeo
-import json
+from typing import TYPE_CHECKING, List, Dict, Optional, Any, Union, Literal
 from vimeo_connection import VimeoConnection
 from vimeo_base import VimeoChild, VimeoItem, get_lines
 from vimeo_video import VimeoVideo
 from vimeo_constants import (
-    GETTER_STR,
     PROPERTIES_BASE,
     PROPERTIES_FOLDER
 )
+
+if TYPE_CHECKING:
+    from vimeo_data import VimeoData
 
 class VimeoFolder(VimeoItem, VimeoChild):
 
@@ -30,6 +30,8 @@ class VimeoFolder(VimeoItem, VimeoChild):
         code_or_uri: Optional[str] = None,
         name: Optional[str] = None,
         description: Optional[str] = None,
+        data: Optional[Dict[str, Any]] = None,
+        data_object: Optional['VimeoData'] = None,
         privacy: Literal['anybody', 'nobody', 'password', 'users'] = 'nobody',
         users: List[str] = [],
         parent_folder: Optional[Union[str, 'VimeoFolder']] = None,
@@ -41,11 +43,21 @@ class VimeoFolder(VimeoItem, VimeoChild):
         self.connection = connection
         self.client = connection.client
 
+        self._data = None  # type: Optional[Dict[str, Any]]
+        self._parent  = None  # type: Optional[VimeoFolder]
+        self._videos = None  # type: Optional[List[VimeoVideo]]
+        self._videos_data = None  # type: Optional[List[Dict[str, Any]]]
+
+        
         if name and code_or_uri:
             raise ValueError(
                 'Parameters: Either code_or_uri or name must be provided.'
             )
-        elif name:
+
+        if not name and data:
+            name = data.get('name')
+
+        if name:
             self._code = self._create(
                 name=name,
                 description=description,
@@ -57,19 +69,20 @@ class VimeoFolder(VimeoItem, VimeoChild):
                 layout=layout,
                 theme=theme
             )
+        else:
+            raise ValueError(
+                'Parameters: Either code_or_uri or name must be provided.'
+            )
 
         # init the parent class
         super(VimeoItem, self).__init__(
             code_or_uri=code_or_uri or self._code,
-            connection=connection
+            connection=connection,
+            data=data,
+            data_object=data_object
         )
 
         super(VimeoChild, self).__init__() # type: ignore
-
-        self._data = None  # type: Optional[Dict[str, Any]]
-        self._parent  = None  # type: Optional[VimeoFolder]
-        self._videos = None  # type: Optional[List[VimeoVideo]]
-        self._videos_data = None  # type: Optional[List[Dict[str, Any]]]
 
     def __str__(self) -> str:
         ignore_keys = ['user', 'metadata', 'pictures']

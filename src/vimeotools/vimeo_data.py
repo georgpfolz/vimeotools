@@ -8,13 +8,18 @@ This module contains the class VimeoData, which is used to display
 information about a Vimeo account and its videos, folders and albums.
 """
 from typing import TYPE_CHECKING, Dict, Optional, List, Union, Any, Literal
+from pathlib import Path
 import json
+import pickle
 from vimeo_constants import (
-    MIN_KEYS,
-    RETURNING_MAP,
-    WHAT_MAP
+    MIN_KEYS
 )
-from vimeo_base import get_lines, nested_value
+from vimeo_base import (
+    get_lines,
+    nested_value,
+    transform_returning,
+    transform_what
+)
 from vimeo_connection import VimeoConnection
 from vimeo_video import VimeoVideo
 from vimeo_folder import VimeoFolder
@@ -25,6 +30,7 @@ class VimeoData:
     def __init__(
         self,
         connection: VimeoConnection,
+        data_file: Optional[str] = None
     ):
         """
         Class for displaying information about a Vimeo account:
@@ -37,11 +43,17 @@ class VimeoData:
         self.client = connection.client
         self.uri = connection.uri
 
-        # initialize
-        self._account_data = None
-        self._videos_data = None
-        self._folders_data = None
-        self._albums_data = None
+        if data_file:
+            self.load(
+                file=data_file
+            )
+        else:
+            # initialize
+            self._account_data = None
+            self._videos_data = None
+            self._folders_data = None
+            self._albums_data = None
+        
         self._videos = None
         self._folders = None
         self._albums = None
@@ -177,48 +189,57 @@ class VimeoData:
         - If 'json', returns a json string.
         """
         # set returning to singular
-        returning = self._transform_returning(returning=returning)  # type: ignore
+        returning = transform_returning(returning=returning)  # type: ignore
 
-        data = {}
+        data = {'data': []}
 
         data_stored = self._data_stored(what=what)
         items_stored = self._items_stored(what=what)
-
+        
         if not refresh:
             if returning == 'dict' and data_stored:
                 return data_stored
             elif returning == 'object' and items_stored:
+
                 return items_stored
 
-        # no refresh or first time
-        items_list = []
-        page = 1
+        if not refresh:
+            if what == 'videos' and self._videos_data:
+                data['data'] = self._videos_data.get('data', [])
+            elif what == 'albums' and self._albums_data:
+                data['data'] = self._albums_data.get('data', [])
+            elif what == 'projects' and self._folders_data:
+                data['data'] = self._folders_data.get('data', [])
         
-        while True:
-            response = self.client.get(
-                f'/me/{what}',
-                params={
-                    'page': page,
-                    'per_page': 100
-                }
-            )
-            if response.status_code != 200:
-                raise Exception(f'Error getting {what}: {response.text}')
-            
-            # we don't care if data is overwritten!
-            # this way we end with the last page number
-            # and the items_list is added thereafter anyway
-            data = response.json()
+        if not data.get('data'):
+            # no refresh or first time
+            items_list = []
+            page = 1
+            while True:
+                response = self.client.get(
+                    f'/me/{what}',
+                    params={
+                        'page': page,
+                        'per_page': 100
+                    }
+                )
+                if response.status_code != 200:
+                    raise Exception(f'Error getting {what}: {response.text}')
+                
+                # we don't care if data is overwritten!
+                # this way we end with the last page number
+                # and the items_list is added thereafter anyway
+                data = response.json()
 
-            for item in data['data']:
-                item['code'] = item.get('uri').split('/')[-1]  # add vimeo code to data
+                for item in data['data']:
+                    item['code'] = item.get('uri').split('/')[-1]  # add vimeo code to data
 
-            items_list.extend(data['data'])
-            if data['paging']['next'] is None:
-                break
-            page += 1
+                items_list.extend(data['data'])
+                if data['paging']['next'] is None:
+                    break
+                page += 1
 
-        data['data'] = items_list
+            data['data'] = items_list
 
         # at this point, data must be a dict
         if what == 'videos':
@@ -235,10 +256,12 @@ class VimeoData:
                 videos = [
                     VimeoVideo(
                         code_or_uri=video['uri'],
-                        conection=self.connection
+                        connection=self.connection,
+                        data_object=self,
+                        data=video
                     )
                     for video
-                    in items_list
+                    in data['data']
                 ]
                 self._videos = videos
                 return videos
@@ -246,10 +269,12 @@ class VimeoData:
                 albums = [
                     VimeoShowcase(
                         code_or_uri=album['uri'],
-                        connection=self.connection
+                        connection=self.connection,
+                        data_object=self,
+                        data=album
                     )
                     for album
-                    in items_list
+                    in data['data']
                 ]
                 self._albums = albums
                 return albums
@@ -257,17 +282,19 @@ class VimeoData:
                 folders = [
                     VimeoFolder(
                         code_or_uri=folder['uri'],
-                        connection=self.connection
+                        connection=self.connection,
+                        data_object=self,
+                        data=folder
                     )
                     for folder
-                    in items_list
+                    in data['data']
                 ]
                 self._folders = folders
                 return folders
         elif returning in ('code', 'uri'):
-            return [item[returning] for item in items_list]
+            return [item[returning] for item in data['data']]
         elif returning == 'list':
-            return items_list
+            return data['data']
         elif returning == 'json':
             return json.dumps(data, indent=4)
         else:
@@ -405,7 +432,7 @@ class VimeoData:
         Get all folders.
         :return: list of VimeoFolder objects
         """
-        returning = self._transform_returning(returning) # type: ignore
+        returning = transform_returning(returning) # type: ignore
 
         return self._get_items(
             what='projects',
@@ -531,7 +558,7 @@ class VimeoData:
         
         Obviously, returning the list of VimeoShowcase objects takes more time than returning the list of dicts.
         """
-        returning = self._transform_returning(returning) # type: ignore
+        returning = transform_returning(returning) # type: ignore
 
         return self._get_items(
             what='albums',
@@ -552,7 +579,7 @@ class VimeoData:
         """
         Refresh data.
         """
-        what = self._transform_what(what) # type: ignore
+        what = transform_what(what) # type: ignore
 
         if what in ('account', 'all'):
             self._get_account_data(
@@ -740,7 +767,7 @@ class VimeoData:
         
         Obviously, returning the list of VimeoVideo objects takes more time than returning the list of dicts.
         """
-        returning = self._transform_returning(returning) # type: ignore
+        returning = transform_returning(returning) # type: ignore
 
         return self._get_items(
             what='videos',
@@ -789,7 +816,7 @@ class VimeoData:
         Example:
         vimeo_client.get_videos_from_album(album='123456', returning='list')
         """
-        returning = self._transform_returning(returning) # type: ignore
+        returning = transform_returning(returning) # type: ignore
 
         try:
             return showcase.get_videos(  # type: ignore
@@ -855,7 +882,7 @@ class VimeoData:
         ] = 'objects',
         refresh: bool = False
     ) -> Union[VimeoVideo, List[Dict[str, Any]], List[str], str]:
-        returning = self._transform_returning(returning) # type: ignore
+        returning = transform_returning(returning) # type: ignore
         
         if not refresh and self._videos_data is not None:
             video = [
@@ -919,7 +946,7 @@ class VimeoData:
         refresh: bool = False,
         returning: Literal['str', 'lines'] = 'str'
     ) -> Union[str, List[str]]:
-        what = self._transform_what(what) # type: ignore
+        what = transform_what(what) # type: ignore
 
         data = {}
 
@@ -963,28 +990,85 @@ class VimeoData:
             indent=indent,
             returning=returning
         )
+    
+    def load(
+        self,
+        file: Union[Path, str] = Path('vimeo_data.json'),
+        format: Optional[Literal['json', 'pickle']] = None,
+        refresh: bool = False
+    ) -> None:
+        if isinstance(file, str):
+            file = Path(file)
+
+        if not file.exists():
+            raise FileNotFoundError(f'File not found: {file}')
         
-    def _transform_what(
+        if not format:
+            format = file.suffix[1:]  # type: ignore
+
+        if format == 'json':
+            with open(file, 'r') as f:
+                data = json.load(f)
+        elif format == 'pickle':
+            with open(file, 'rb') as f:
+                data = pickle.load(f)
+        else:
+            raise ValueError(f'Unknown format: {format}')
+        
+        if not data:
+            raise ValueError(f'No data in {file}')
+
+        self._data = data
+
+        # redundant!
+        self._account_data = data['account']
+        self._videos_data = data['videos']
+        self._folders_data = data['projects']
+        self._albums_data = data['albums']
+    
+    def save(
         self,
-        what: str
-    ) -> str:
-        what = what.lower()
+        file: Optional[Union[Path, str]] = Path('vimeo_data.json'),
+        format: Optional[Literal['json', 'pickle']] = None,
+        refresh: bool = False
+    ) -> None:
+        if isinstance(file, str):
+            file = Path(file)
+        
+        if not format:
+            format = file.suffix[1:]  # type: ignore
 
-        try:
-            return WHAT_MAP[what]
-        except KeyError:
-            raise ValueError(f'Unknown value for what: {what}')
+        data_to_save = {
+            'account': self._get_account_data(
+                returning='dict',
+                refresh=refresh
+            ),
+            'videos': self._get_items(
+                what='videos',
+                returning='dict',
+                refresh=refresh
+            ),
+            'albums': self._get_items(
+                what='albums',
+                returning='dict',
+                refresh=refresh
+            ),
+            'projects': self.get_folders(
+                returning='dict',
+                refresh=refresh
+            )
+        }
 
-    def _transform_returning(
-        self,
-        returning: str
-    ) -> str:
-        returning = returning.lower()
-
-        try:
-            return RETURNING_MAP[returning]
-        except KeyError:
-            raise ValueError(f'Unknown value for returning: {returning}')
+        print(f'Saving data to {file}...')
+        
+        if format == 'json':
+            with open(file, 'w') as f:
+                json.dump(data_to_save, f, indent=4)
+        elif format == 'pickle':
+            with open(file, 'wb') as f:
+                pickle.dump(data_to_save, f)
+        else:
+            raise ValueError(f'Unknown format: {format}')
 
     def show_account(
         self,
@@ -1061,3 +1145,27 @@ class VimeoData:
             refresh=refresh,
             returning=returning
         )
+
+    def update_data(
+        self,
+        what: Literal['account', 'videos', 'albums', 'projects'],
+        data: Union[Dict[str, Any], List[Dict[str, Any]]]
+    ) -> None:
+        """
+        Update data in the VimeoData object
+        """
+        map_what = {
+            'account': self._account_data,
+            'videos': self._videos_data,
+            'albums': self._albums_data,
+            'projects': self._folders_data
+        }
+
+        if isinstance(data, list):
+            """
+            find the item(s) in the list by uri or code and update them
+            or append them if they don't exist
+            """
+            pass
+        elif isinstance(data, dict):
+            map_what[what] = data

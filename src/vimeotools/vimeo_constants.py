@@ -17,7 +17,7 @@ SETTER_STR = """
 @{prop}.setter
 def {prop}(self, value: str):
     self._data['{prop}'] = value
-    self._set_key('{prop}', value)
+    self.set_property('{set_key}', value)
 """
 
 # properties that are common to VimeoVideo, VimeoShowcase, VimeoFolder
@@ -220,6 +220,7 @@ SHOWCASE_ALLOWED_KEYS_TO_SET = [
                     #           player - The videos appear in the player.
                     #           name	String	The name of the showcase.
                     #           password	String	The showcase's password. This field is required only when privacy is password.
+    'name',  #      	    String	The name of the showcase.
     'privacy',  #    	    String	The privacy level of the showcase.
                     #           anybody - Anyone can access the showcase, either on Vimeo or through an embed.
                     #           embed_only - The showcase doesn't appear on Vimeo, but it can be embedded on other sites.

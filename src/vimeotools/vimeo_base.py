@@ -13,11 +13,34 @@ import json
 from vimeo_constants import (
     GETTER_STR,
     SETTER_STR,
-    PROPERTIES_BASE
+    PROPERTIES_BASE,
+    RETURNING_MAP,
+    WHAT_MAP
 )
 if TYPE_CHECKING:
     from vimeo_folder import VimeoFolder
     from vimeo_connection import VimeoConnection
+    from vimeo_data import VimeoData
+
+def transform_returning(
+    returning: str
+) -> str:
+    returning = returning.lower()
+
+    try:
+        return RETURNING_MAP[returning]
+    except KeyError:
+        raise ValueError(f'Unknown value for returning: {returning}')
+
+def transform_what(
+    what: str
+) -> str:
+    what = what.lower()
+
+    try:
+        return WHAT_MAP[what]
+    except KeyError:
+        raise ValueError(f'Unknown value for what: {what}')
 
 def nested_value(
     data: Dict[str, Any],
@@ -148,7 +171,7 @@ class VimeoChild:
     ) -> Dict[str, Any]:
         if not refresh and self._parent:
             return self._parent.get_data(refresh=False)
-            
+        
         folder_data = self.get_data(refresh=refresh).get('parent_folder', {}) # type: ignore
 
         if not keys:
@@ -231,6 +254,14 @@ class VimeoBaseItem:
     def code(self) -> str:
         return self._code
     
+    @property
+    def temp_data(self) -> Dict[str, Any]:
+        return self._temp_data
+    
+    @temp_data.setter
+    def temp_data(self, value: Dict[str, Any]) -> None:
+        self._temp_data = value
+
     for key, val in PROPERTIES_BASE.items():
         exec(GETTER_STR.format(prop=key))
         if val['type'] == 'str' and val.get('setable'):
@@ -241,11 +272,23 @@ class VimeoBaseItem:
         self,
         connection: 'VimeoConnection',
         code_or_uri: Optional[str] = None,
-        live: bool = False  # live mode
+        live: bool = False,  # live mode
+        data: Optional[Dict[str, Any]] = None,
+        data_object: Optional['VimeoData'] = None
     ):
         self.connection = connection
         self.client = connection.client
         self._live = live
+        self._temp_data = {}  # temporary data storage for the object
+        data_object = data_object
+
+        if data_object and not data:
+            data = data_object._data
+
+        if data:
+            self._data = data
+        else:
+            self._data = None  # initialize data as hidden attribute: method get_data() has to be used
 
         if code_or_uri:
             if '/' in code_or_uri:  # assume it's a uri
@@ -254,8 +297,6 @@ class VimeoBaseItem:
             else:  # assume it's a code
                 self._code = code_or_uri
                 self._uri = f'{self.BASE_URI}/{code_or_uri}'
-
-        self._data = None  # initialize data as hidden attribute: method get_data() has to be used
     
     def _keys_is_allowed_to_set(
         self,
@@ -375,6 +416,18 @@ class VimeoBaseItem:
     def get_user_link(self) -> str:
         return self.get_user_data()['link']
     
+    @property
+    def user_uri(self) -> str:
+        return self.get_user_data()['uri']
+    
+    @property
+    def user_id(self) -> str:
+        return self.user_uri.split('/')[-1]
+
+    @property
+    def user_name(self) -> str:
+        return self.get_user_data()['name']
+
     def get_user_uri(self) -> str:
         return self.get_user_data()['uri']
 
@@ -447,17 +500,14 @@ class VimeoItem(VimeoBaseItem):  # videos and showcases
     """
     An abstract class to represent a Vimeo Item. This is the base of the
     Video and Showcase classes.
-
-    One key method is get_data(), which not only returns the item's data
-    but also stores it in the object for future use. If the refresh parameter
-    is not set to True, the data will not be fetched again from the API in
-    subsequent calls to get_data().
     """
 
     def __init__(
         self,
         connection: 'VimeoConnection',
-        code_or_uri: str
+        code_or_uri: str,
+        data: Optional[Dict[str, Any]] = None,
+        data_object: Optional['VimeoData'] = None
     ):
         """
         Initialize the VimeoItem object.
@@ -468,37 +518,9 @@ class VimeoItem(VimeoBaseItem):  # videos and showcases
         """
         super().__init__(
             connection=connection,
-            code_or_uri=code_or_uri
-        )
-
-    def add_tag(
-        self,
-        tag: str,
-        refresh: bool = False
-    ):
-        self.add_tags(
-            tags=tag,
-            refresh=refresh
-        )
-
-    def add_tags(
-        self,
-        tags: Union[str, List[str]],
-        refresh: bool = False
-    ):
-        """
-        Add tags to the video.
-        :param tags: str or list of str
-        :param refresh: bool
-        :return: None
-        """
-        if isinstance(tags, str):
-            tags = [tags]
-        
-        tags = self.get_tags(refresh=refresh) + tags # type: ignore
-
-        self.set_tags(
-            tags=tags
+            code_or_uri=code_or_uri,
+            data=data,
+            data_object=data_object
         )
 
     def get_description(
@@ -506,119 +528,3 @@ class VimeoItem(VimeoBaseItem):  # videos and showcases
         refresh: bool = False
     ) -> str:
         return self.get_property('description', refresh=refresh)
-
-    def get_tags(
-        self,
-        returning: Literal[
-            'dict',
-            'list',
-            'json',
-            'names',
-            'name',
-            'uris',
-            'uri',
-            'tags',
-            'tag',
-            'canonical'
-        ] = 'dict',
-        refresh: bool = False
-    ) -> Union[List[str], str]:
-        tags = self.get_property('tags', refresh=refresh)
-
-        # not sure why data has not always the same structure
-        if isinstance(tags, dict):
-            tags = tags['data']
-
-        if returning == 'dict':
-            return tags
-        elif returning == 'list':
-            return tags['data']
-        elif returning == 'json':
-            return json.dumps(tags)
-        else:
-            if returning.endswith('s'):
-                returning = returning[:-1] # type: ignore
-            return [tag[returning] for tag in tags]
-
-    def remove_tag(
-        self,
-        tag: str
-    ):
-        """
-        Remove a tag from the video.
-        :param tag: str
-        :return: None
-
-        This method uses the delete method of the Vimeo API.
-        """
-        response = self.client.delete(
-            f'{self.uri}/tags/{tag}'
-        )
-        assert response.status_code == 204, f'Error: {response.status_code}'
-        self._data['tags'] = response.text.json()['tags']  # type: ignore
-
-    def remove_tags(
-        self,
-        tags: Union[str, List[str]],
-        refresh: bool = False
-    ):
-        """
-        Remove tags from the video.
-        :param tags: str or list of str
-        :param refresh: bool
-        :return: None
-
-        This method uses the put method of the Vimeo API.
-        """
-        if isinstance(tags, str):
-            tags = [tags]
-        
-        tags_list = [{'name': tag} for tag in self.get_tags(refresh=refresh) if tag not in tags]
-        
-        response = self.client.put(
-            f'{self.uri}/tags',
-            data=tags_list
-        )
-        assert response.status_code == 200, f'Error: {response.status_code}'
-        self._data['tags'] = tags  # type: ignore
-
-    def set_description(self, value: str):
-        self.set_property(
-            key='description',
-            value=value
-        )
-
-    def set_tags(
-        self,
-        tags: Union[str, List[str], List[Dict[str, str]]]
-    ):
-        set_tags = []
-        for tag in tags:
-            if isinstance(tag, str):
-                set_tags.append({'name': tag})
-            if isinstance(tag, dict):
-                set_tags.append({'name': tag['name']})
-
-        uri = f'{self.uri}/tags'
-        
-        tags_list = [tag for tag in set_tags]
-        response = self.client.put(
-            uri,
-            data=tags_list
-        )
-        if response.status_code == 400:
-            raise Exception((
-                '400: Bad Request,'
-                "either the request body wasn't supplied,"
-                'or a parameter is invalid, '
-                "The request body doesn't contain a JSON-encoded list of tags. "
-                f'You supplied: {tags_list}'
-            ))
-        elif response.status_code == 403:
-            raise Exception((
-                '403: Forbidden, you are not allowed to add tags to this video.'
-                'You may not have the permission or the total number of tags exceeds the limit (20). '
-                f'You supplied: {tags_list}'
-            ))
-        assert response.status_code == 200, f'Error: {response.status_code}'
-        self._data['tags'] = response.json()  # type: ignore
