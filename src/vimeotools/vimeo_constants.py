@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import json
+import pickle
 """
 =====================
 Vimeo Tools Constants
@@ -19,6 +21,24 @@ def {prop}(self, value: str):
     self._data['{prop}'] = value
     self.set_property('{set_key}', value)
 """
+
+# this might be a little bit silly ;)
+SAVE_FMT_MAP = {
+    'json': {
+        'suffix': '.json',
+        'dump': json.dump,
+        'mode': 'w',
+        'kwargs': {
+            'indent': 4
+        }
+    },
+    'pickle': {
+        'suffix': '.pickle',
+        'dump': pickle.dump,
+        'mode': 'wb',
+        'kwargs': {}
+    }
+}
 
 # properties that are common to VimeoVideo, VimeoShowcase, VimeoFolder
 
@@ -330,6 +350,7 @@ MIN_KEYS = {
 }
 
 WHAT_MAP = {
+    'all': 'all',
     'account': 'account',
     'video': 'videos',
     'videos': 'videos',

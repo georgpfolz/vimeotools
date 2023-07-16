@@ -6,6 +6,14 @@ Vimeo Tools Vimeo Base Module
 
 This module contains the base classes VimeoChild and VimeoItem, as well as
 functions used by the other classes.
+
+:Author: Georg Pfolz
+
+Concering names used for variables and functions:
+    - The term "property" is used for the data coming from returned by the Vimeo API.
+      It's what's called "parameters" in the Vimeo API documentation.
+    - The term "attribute" is used for the data stored in the VimeoItem objects.
+      These are temporary data that are lost when the object is deleted.
 """
 
 from typing import TYPE_CHECKING, Dict, Optional, List, Union, Any, Literal
@@ -25,6 +33,9 @@ if TYPE_CHECKING:
 def transform_returning(
     returning: str
 ) -> str:
+    if not returning:
+        return ''
+    
     returning = returning.lower()
 
     try:
@@ -261,6 +272,10 @@ class VimeoBaseItem:
     @temp_data.setter
     def temp_data(self, value: Dict[str, Any]) -> None:
         self._temp_data = value
+    
+    @property
+    def attributes(self) -> Dict[str, Any]:
+        return self._temp_attributes
 
     for key, val in PROPERTIES_BASE.items():
         exec(GETTER_STR.format(prop=key))
@@ -280,6 +295,13 @@ class VimeoBaseItem:
         self.client = connection.client
         self._live = live
         self._temp_data = {}  # temporary data storage for the object
+
+        # temporary properties storage for the object
+        # this may seem a bit redundant with _temp_data, but this way,
+        # _temp_data can be overwritten without consideration for the
+        # properties that are stored in _temp_attributes
+        self._temp_attributes = {}
+
         data_object = data_object
 
         if data_object and not data:
@@ -310,9 +332,20 @@ class VimeoBaseItem:
         
         return False
 
+    def get_attribute(
+        self,
+        name: str
+    ) -> Any:
+        return self._temp_attributes.get(name, None)
+    
+    def get_attributes(
+        self
+    ) -> Dict[str, Any]:
+        return self._temp_attributes
+
     def set_property(
         self,
-        key: str,
+        name: str,
         value: Any
     ):
         """
@@ -321,13 +354,13 @@ class VimeoBaseItem:
         :param key: The key can be provided in dotted notation, e.g. "privacy.view"
         :param value: The value to set
         """
-        if not self._keys_is_allowed_to_set(key=key):
+        if not self._keys_is_allowed_to_set(key=name):
             raise ValueError(
-                f'Invalid key "{key}". Allowed keys are: {self.allowed_keys_to_set}' # type: ignore (in child class)
+                f'Invalid key "{name}". Allowed keys are: {self.allowed_keys_to_set}' # type: ignore (in child class)
             )
         
         uri = self.uri  # from the child class
-        update_data = denest_key(key, value)
+        update_data = denest_key(name, value)
         
         # client also comes from the child class
         response = self.client.patch(
@@ -468,6 +501,25 @@ class VimeoBaseItem:
     @description.setter
     def description(self, value: str):
         self.set_property('description', value)
+
+    def set_temp_data(self, value: Dict[str, Any]) -> None:
+        """
+        despite there begin a setter, this is needed to set
+        temp_data from Restricted Python (Zope)
+        """
+        self._temp_data = value
+
+    def set_attribute(
+        self,
+        name: str,
+        value: Any
+    ) -> None:
+        """
+        This stores temporary attributes in the object. This is useful
+        for storing data that's needed e.g. for program logic but not to
+        be stored on Vimeo.
+        """
+        self._temp_attributes[name] = value
 
     def store_json(
         self,

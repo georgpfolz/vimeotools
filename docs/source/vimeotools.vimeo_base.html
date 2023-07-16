@@ -29,7 +29,7 @@
             <a href="../index.html" class="icon icon-home"> vimeotools
           </a>
               <div class="version">
-                0.0.3
+                0.0.4
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -72,6 +72,20 @@
 <h1>Vimeo Tools Vimeo Base Module<a class="headerlink" href="#vimeo-tools-vimeo-base-module" title="Permalink to this heading"></a></h1>
 <p>This module contains the base classes VimeoChild and VimeoItem, as well as
 functions used by the other classes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Author</dt>
+<dd class="field-odd"><p>Georg Pfolz</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Concering names used for variables and functions:</dt><dd><ul class="simple">
+<li><p>The term “property” is used for the data coming from returned by the Vimeo API.
+It’s what’s called “parameters” in the Vimeo API documentation.</p></li>
+<li><p>The term “attribute” is used for the data stored in the VimeoItem objects.
+These are temporary data that are lost when the object is deleted.</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py class">
 <dt class="sig sig-object py" id="vimeotools.vimeo_base.VimeoBaseItem">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">VimeoBaseItem</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">connection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">code_or_uri</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">live</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_object</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vimeotools.vimeo_base.VimeoBaseItem" title="Permalink to this definition"></a></dt>
@@ -97,6 +111,16 @@ subsequent calls to get_data().</p>
 <dt class="sig sig-object py" id="vimeotools.vimeo_base.VimeoBaseItem.BASE_URI">
 <span class="sig-name descname"><span class="pre">BASE_URI</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'/me'</span></em><a class="headerlink" href="#vimeotools.vimeo_base.VimeoBaseItem.BASE_URI" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="vimeotools.vimeo_base.VimeoBaseItem.attributes">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">attributes</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#vimeotools.vimeo_base.VimeoBaseItem.attributes" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="vimeotools.vimeo_base.VimeoBaseItem.code">
@@ -139,6 +163,29 @@ subsequent calls to get_data().</p>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vimeotools.vimeo_base.VimeoBaseItem.get_attribute">
+<span class="sig-name descname"><span class="pre">get_attribute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vimeotools.vimeo_base.VimeoBaseItem.get_attribute" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></p>
+</dd>
+<dt class="field-even">Parameters</dt>
+<dd class="field-even"><p><strong>name</strong> (<em>str</em>) – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vimeotools.vimeo_base.VimeoBaseItem.get_attributes">
+<span class="sig-name descname"><span class="pre">get_attributes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#vimeotools.vimeo_base.VimeoBaseItem.get_attributes" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -308,15 +355,50 @@ subsequent calls to get_data().</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="vimeotools.vimeo_base.VimeoBaseItem.set_attribute">
+<span class="sig-name descname"><span class="pre">set_attribute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vimeotools.vimeo_base.VimeoBaseItem.set_attribute" title="Permalink to this definition"></a></dt>
+<dd><p>This stores temporary attributes in the object. This is useful
+for storing data that’s needed e.g. for program logic but not to
+be stored on Vimeo.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+<dt class="field-even">Parameters</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>) – </p></li>
+<li><p><strong>value</strong> (<em>Any</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="vimeotools.vimeo_base.VimeoBaseItem.set_property">
-<span class="sig-name descname"><span class="pre">set_property</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vimeotools.vimeo_base.VimeoBaseItem.set_property" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">set_property</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vimeotools.vimeo_base.VimeoBaseItem.set_property" title="Permalink to this definition"></a></dt>
 <dd><p>Set a property of the item. The property must be setable.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>key</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The key can be provided in dotted notation, e.g. “privacy.view”</p></li>
+<li><p><strong>key</strong> – The key can be provided in dotted notation, e.g. “privacy.view”</p></li>
 <li><p><strong>value</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>) – The value to set</p></li>
+<li><p><strong>name</strong> (<em>str</em>) – </p></li>
 </ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vimeotools.vimeo_base.VimeoBaseItem.set_temp_data">
+<span class="sig-name descname"><span class="pre">set_temp_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vimeotools.vimeo_base.VimeoBaseItem.set_temp_data" title="Permalink to this definition"></a></dt>
+<dd><p>despite there begin a setter, this is needed to set
+temp_data from Restricted Python (Zope)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+<dt class="field-even">Parameters</dt>
+<dd class="field-even"><p><strong>value</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>) – </p>
 </dd>
 </dl>
 </dd></dl>

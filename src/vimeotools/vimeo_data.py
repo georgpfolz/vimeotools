@@ -12,7 +12,8 @@ from pathlib import Path
 import json
 import pickle
 from vimeo_constants import (
-    MIN_KEYS
+    MIN_KEYS,
+    SAVE_FMT_MAP
 )
 from vimeo_base import (
     get_lines,
@@ -158,9 +159,8 @@ class VimeoData:
             'codes',
             'uri',
             'uris',
-            'None',
-            None
-        ] = None,
+            'None'
+        ] = 'object',
         refresh: bool = False
     ) -> Union[
             Dict[str, Any],
@@ -178,7 +178,7 @@ class VimeoData:
         - If 'json', returns a json string.
         """
         # set returning to singular
-        returning = transform_returning(returning=returning)  # type: ignore
+        returning = transform_returning(returning=returning)
 
         data = {'data': []}
 
@@ -189,10 +189,8 @@ class VimeoData:
             if returning == 'dict' and data_stored:
                 return data_stored
             elif returning == 'object' and items_stored:
-
                 return items_stored
 
-        if not refresh:
             if what == 'videos' and self._videos_data:
                 data['data'] = self._videos_data.get('data', [])
             elif what == 'albums' and self._albums_data:
@@ -787,6 +785,14 @@ class VimeoData:
         format: Optional[Literal['json', 'pickle']] = None,
         refresh: bool = False
     ) -> None:
+        """
+        Load the data from a file.
+
+        :param file: Path or str
+        :param format: 'js
+        :param refresh: bool
+        :return: None
+        """
         if isinstance(file, str):
             file = Path(file)
 
@@ -815,7 +821,7 @@ class VimeoData:
         self._videos_data = data['videos']
         self._folders_data = data['projects']
         self._albums_data = data['albums']
-        
+
     @property
     def nb_folders(
         self
@@ -851,6 +857,22 @@ class VimeoData:
         return self.get_count(
             what='videos'
         )
+
+    reload = load  # alias, reload might be more explicit and intuitive in some cases
+    """
+    Load the data from a file.
+
+    :param file: Path or str
+    :param format: 'js
+    :param refresh: bool
+    :return: None
+
+    Alias for load.
+
+    Its purpose is to reload the data from a file if the data might have been modified,
+    but the object is still the same (such as in a module from which functions are imported,
+    but the data object is not created anew each time)
+    """
     
     def refresh(
         self,
@@ -864,6 +886,12 @@ class VimeoData:
     ) -> None:
         """
         Refresh data.
+
+        :param what: str
+        :param live: bool
+        :return: None
+
+        Fetching data from the API (live)
         """
         what = transform_what(what) # type: ignore
 
@@ -1029,7 +1057,12 @@ class VimeoData:
     def save(
         self,
         file: Union[Path, str] = Path('vimeo_data.json'),
-        format: Optional[Literal['json', 'pickle']] = None,
+        format: Optional[
+            Union[
+                Literal['json', 'pickle'],
+                List[Literal['json', 'pickle']]
+            ]
+        ] = None,
         refresh: bool = False
     ) -> None:
         if isinstance(file, str):
@@ -1037,6 +1070,9 @@ class VimeoData:
         
         if not format:
             format = file.suffix[1:]  # type: ignore (impossible that it's not a Path)
+
+        if isinstance(format, str):
+            format = [format]
 
         data_to_save = {
             'account': self._get_account_data(
@@ -1059,16 +1095,15 @@ class VimeoData:
             )
         }
 
-        print(f'Saving data to {file}...')
-        
-        if format == 'json':
-            with open(file, 'w') as f:
-                json.dump(data_to_save, f, indent=4)
-        elif format == 'pickle':
-            with open(file, 'wb') as f:
-                pickle.dump(data_to_save, f)
-        else:
-            raise ValueError(f'Unknown format: {format}')
+        for fmt in format:  # type: ignore (at this point, format is a list)
+            # change file suffix to format
+
+            file = file.with_suffix(SAVE_FMT_MAP[fmt]['suffix'])
+
+            print(f'Saving data to {file}...')
+
+            with open(file, SAVE_FMT_MAP[fmt]['mode']) as f:
+                SAVE_FMT_MAP[fmt]['dump'](data_to_save, f, **SAVE_FMT_MAP[fmt]['kwargs'])
 
     def show_account(
         self,

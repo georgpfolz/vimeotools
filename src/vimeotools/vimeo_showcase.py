@@ -128,6 +128,12 @@ class VimeoShowcase(VimeoItem):
         lines.append(f'  - more keys: ' + ', '.join(ignore_keys))
         return '\n'.join(lines)
 
+    def get_test_data(self):
+        """
+        Get test data for the showcase.
+        """
+        return 'TEST DATA'
+
     def add_logo(
         self,
         picture: str
