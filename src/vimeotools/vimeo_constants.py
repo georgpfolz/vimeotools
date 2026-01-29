@@ -230,18 +230,19 @@ PROPERTIES_SHOWCASE = {
 }
 
 SHOWCASE_ALLOWED_KEYS_TO_SET = [
+    'embed.hide_vimeo_logo',
     'brand_color',  #	    String	The hexadecimal code for the color of the player buttons and showcase controls.
     'description',  #	    String	The description of the showcase.
-    'domain',  #    	    String	The custom domain of the showcase.
-    'hide_nav',  #  	    Boolean	Whether to hide Vimeo navigation when displaying the showcase.
+    'domain',       #	    String	The custom domain of the showcase.
+    'hide_nav',     #       Boolean	Whether to hide Vimeo navigation when displaying the showcase.
     'hide_upcoming',  #     Boolean	Whether to include the upcoming live event in the showcase.
-    'layout',  #    	    String	The type of layout for presenting the showcase.
+    'layout',       #       String	The type of layout for presenting the showcase.
                     #           grid - The videos appear in a grid.
                     #           player - The videos appear in the player.
                     #           name	String	The name of the showcase.
                     #           password	String	The showcase's password. This field is required only when privacy is password.
-    'name',  #      	    String	The name of the showcase.
-    'privacy',  #    	    String	The privacy level of the showcase.
+    'name',         #       String	The name of the showcase.
+    'privacy',      #       String	The privacy level of the showcase.
                     #           anybody - Anyone can access the showcase, either on Vimeo or through an embed.
                     #           embed_only - The showcase doesn't appear on Vimeo, but it can be embedded on other sites.
                     #           nobody - No one can access the showcase, including the authenticated user.
@@ -249,7 +250,7 @@ SHOWCASE_ALLOWED_KEYS_TO_SET = [
                     #           team - Only members of the authenticated user's team can access the showcase.
                     #           unlisted - The showcase can't be accessed if the URL omits its unlisted hash.
     'review_mode',  #  	    Boolean	Whether showcase videos use the review mode URL.
-    'sort',  #      	    String	The default sort order of the videos as they appear in the showcase.
+    'sort',         #       String	The default sort order of the videos as they appear in the showcase.
                     #           added_first - The videos appear according to when they were added to the showcase, with the most recently added first.
                     #           added_last - The videos appear according to when they were added to the showcase, with the most recently added last.
                     #           alphabetical - The videos appear alphabetically by their title.
@@ -259,10 +260,10 @@ SHOWCASE_ALLOWED_KEYS_TO_SET = [
                     #           newest - The videos appear in chronological order with the newest first.
                     #           oldest - The videos appear in chronological order with the oldest first.
                     #           plays - The videos appear according to their number of plays.
-    'theme',  #     	    String	The color theme of the showcase.
+    'theme',        #       String	The color theme of the showcase.
                     #          dark - The showcase uses the dark theme.
-                    #           standard - The showcase uses the standard theme.
-    'url'  #        	    String	The custom Vimeo URL of the showcase.
+                    #          standard - The showcase uses the standard theme.
+    'url',          #       String	The custom Vimeo URL of the showcase.
     'use_custom_domain'  #	Boolean	Whether the user has opted for a custom domain for their showcase.
 ]
 

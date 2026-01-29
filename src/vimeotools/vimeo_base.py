@@ -10,7 +10,7 @@ functions used by the other classes.
 :Author: Georg Pfolz
 
 Concering names used for variables and functions:
-    - The term "property" is used for the data coming from returned by the Vimeo API.
+    - The term "property" is used for the data coming from / returned by the Vimeo API.
       It's what's called "parameters" in the Vimeo API documentation.
     - The term "attribute" is used for the data stored in the VimeoItem objects.
       These are temporary data that are lost when the object is deleted.
@@ -373,7 +373,7 @@ class VimeoBaseItem:
         elif response.status_code == 403:
             raise Exception("You don't have permission to update this item.")
         elif response.status_code == 400:
-            raise Exception("A parameter is invalid.")
+            raise Exception("A parameter is invalid." + response.text)
         else:
             raise Exception("Something went wrong.")
 
@@ -469,9 +469,10 @@ class VimeoBaseItem:
     ) -> str:
         return self.get_user_data()['name']
     
-    def refresh(self):
+    def refresh(self, timeout=None):
         data = self.client.get(
-            self._uri
+            self._uri,
+            timeout=timeout
         ).json()
         self._data = data  # store to avoid unnecessary requests
     

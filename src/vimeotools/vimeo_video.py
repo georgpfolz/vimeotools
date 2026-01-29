@@ -256,7 +256,7 @@ class VimeoVideo(VimeoItem, VimeoChild):
 
     def set_description(self, value: str):
         self.set_property(
-            key='description',
+            name='description',
             value=value
         )
 

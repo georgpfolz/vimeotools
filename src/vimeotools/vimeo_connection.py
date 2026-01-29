@@ -25,7 +25,8 @@ class VimeoConnection:
         config_file: Optional[Union[str, Path]] = Path('vimeo_config.json'),
         token: Optional[str] = None,
         key: Optional[str] = None,
-        secret: Optional[str] = None
+        secret: Optional[str] = None,
+        timeout: Optional[int] = None  # Timeout in Sekunden, default 30
     ):
         """
         Initialize the Vimeo client.
@@ -51,5 +52,8 @@ class VimeoConnection:
                 'Parameters: Either token, key and secret or config_file must be provided.'
             )
 
-        self.client = vimeo.VimeoClient(**vimeo_client_data)
+        self.client = vimeo.VimeoClient(
+            **vimeo_client_data,
+            timeout=timeout
+        )
         self.uri = '/me'

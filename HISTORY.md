@@ -1,4 +1,8 @@
 # History
+## 0.0.5 (2025-01-23)
+- **set_description**: corrected wrong parameter name
+- VimeoConnection \__init__ now has a parameter "timeout"
+
 ## 0.0.4 (2023-07-16)
 - **VimeoBaseItem**: method **set_temp_data** (for use in Restricted Python where methods with the setter-decorator do not work because attributes cannot be changed)
 - **VimeoBaseItem**: new attribute *\_temp_attributes* for storing volatile "attributes" on the object and the methods needed:

@@ -5,6 +5,9 @@ Vimeo Tools Showcase Module
 ===========================
 
 This module contains the class VimeoShowcase.
+
+There is one exception to the attributes being temporary data:
+- video_codes will be saved in the data file
 """
 from __future__ import annotations
 from typing import TYPE_CHECKING, Dict, Optional, List, Union, Any, Literal
@@ -107,7 +110,10 @@ class VimeoShowcase(VimeoItem):
         lines = [f'Object: {VimeoShowcase.__repr__(self)}']
         
         for prop, meta in {**PROPERTIES_BASE, **PROPERTIES_SHOWCASE}.items():
-            value = getattr(self, prop)
+            try:
+                value = getattr(self, prop)
+            except KeyError:
+                value = '[not found]'
 
             if prop in ignore_keys:
                 continue
@@ -119,6 +125,7 @@ class VimeoShowcase(VimeoItem):
                 indent=2
             )
         
+        """
         videos = self.videos or []
         lines.append(f'  - {len(videos)} Videos')
         if videos:
@@ -126,6 +133,7 @@ class VimeoShowcase(VimeoItem):
                 lines.append(f'    - {video.name} ({video.code})') # type: ignore
 
         lines.append(f'  - more keys: ' + ', '.join(ignore_keys))
+        """
         return '\n'.join(lines)
 
     def get_test_data(self):
